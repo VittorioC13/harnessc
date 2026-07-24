@@ -65,7 +65,7 @@ refuse and point at this section.
 - **Tests:** vitest
 - **Lint/format:** eslint + prettier
 - **API:** `openai` SDK configured with `baseURL: https://api.deepseek.com` (DeepSeek's
-  API is OpenAI-compatible); default model `deepseek-chat`, overridable via env var
+  API is OpenAI-compatible); default model `deepseek-v4-flash`, overridable via env var
   `HARNESSC_MODEL`
 - **Schema validation:** zod — every LLM response is parsed against a zod schema; invalid
   responses are retried once, then that item is skipped with a warning (never crash)

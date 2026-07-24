@@ -2,6 +2,8 @@ import { Command } from "commander";
 import { discoverSessions } from "./lib/transcripts.js";
 import { extractSignals } from "./lib/signals.js";
 import { renderTable } from "./lib/format.js";
+import { summarizeSession } from "./lib/summarize.js";
+import { MissingApiKeyError } from "./lib/llm.js";
 
 const VERSION = "0.1.0";
 
@@ -68,6 +70,55 @@ export function buildProgram(): Command {
         for (const candidate of candidates) {
           console.log(`  [${candidate.signalType}] ${candidate.timestamp.toISOString()}  ${candidate.excerpt}`);
         }
+      }
+    });
+
+  program
+    .command("debug:summarize", { hidden: true })
+    .description("Summarize failure-signal candidates per session via the DeepSeek API")
+    .option("--project <substring>", "filter by project directory name substring")
+    .option("--limit <n>", "limit to the N most recent sessions", (v) => parseInt(v, 10), 50)
+    .option("--all", "scan every session, ignoring --limit")
+    .action(async (opts: { project?: string; limit: number; all?: boolean }) => {
+      const signals = await extractSignals(opts);
+      const sessions = [...signals.candidatesBySession.entries()];
+      if (sessions.length === 0) {
+        console.log("No sessions with failure-signal candidates in the selected range.");
+        return;
+      }
+
+      let totalCostUsd = 0;
+      let skippedCount = 0;
+
+      for (const [sessionId, candidates] of sessions) {
+        const project = candidates[0]?.project ?? "";
+        let result;
+        try {
+          result = await summarizeSession(candidates);
+        } catch (err) {
+          if (err instanceof MissingApiKeyError) {
+            console.error(err.message);
+            process.exitCode = 1;
+            return;
+          }
+          throw err;
+        }
+
+        totalCostUsd += result.costUsd;
+        console.log(`\n${project} / ${sessionId}`);
+        if (result.skipped) {
+          skippedCount++;
+          console.warn(`  skipped: ${result.warning}`);
+          continue;
+        }
+        for (const event of result.events) {
+          console.log(`  [${event.severity}] ${event.description}`);
+        }
+      }
+
+      console.log(`\nEstimated cost: $${totalCostUsd.toFixed(4)}`);
+      if (skippedCount > 0) {
+        console.warn(`Warning: skipped ${skippedCount} session(s) after a failed retry.`);
       }
     });
 

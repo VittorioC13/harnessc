@@ -58,9 +58,10 @@ of the noise).
 
 ## Day 2 — The AI analysis
 
-### [ ] 2.1 Per-session summarization via DeepSeek API — DRIVER: Claude Code
+### [x] 2.1 Per-session summarization via DeepSeek API — DRIVER: Claude Code
 Implement PRD §7 Step C: one API call per session, zod-validated JSON out, retry-once
 policy, specificity demanded in the prompt. Add `harnessc debug:summarize --limit 3`.
+Status: done — `src/lib/llm.ts` (openai SDK against DeepSeek, model `deepseek-v4-flash`, cost estimate from published per-token rates) + `src/lib/summarize.ts` (zod-validated Step C prompt, retry-once on schema mismatch, skip+warn after). Note: while implementing this, found DeepSeek's docs state `deepseek-chat`/`deepseek-reasoner` deprecate 2026-07-24 in favor of `deepseek-v4-flash` — updated PRD/DECISIONS accordingly before writing code. Real run against 2 sessions produced specific, evidence-backed descriptions (named actual commands/files/error codes); cost $0.0012.
 **VERIFY:** `node dist/cli.js debug:summarize --limit 3`
 → for 3 sessions, a list of one-sentence failure descriptions that are SPECIFIC (they
 name commands/files/functions). Cost note prints. If descriptions are generic, apply the
