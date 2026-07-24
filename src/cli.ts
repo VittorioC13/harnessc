@@ -1,6 +1,6 @@
 import { writeFile } from "node:fs/promises";
 import { Command } from "commander";
-import { discoverSessions } from "./lib/transcripts.js";
+import { discoverSessions, DEFAULT_CLAUDE_PROJECTS_DIR } from "./lib/transcripts.js";
 import { extractSignals } from "./lib/signals.js";
 import { renderTable } from "./lib/format.js";
 import { summarizeSession } from "./lib/summarize.js";
@@ -27,11 +27,24 @@ export function buildProgram(): Command {
     .action(async (opts: { project?: string; limit: number; all?: boolean }) => {
       console.log("Locating and parsing Claude Code sessions...");
       const signals = await extractSignals(opts);
+
+      if (signals.sessionsScanned === 0) {
+        const filterNote = opts.project ? ` matching --project "${opts.project}"` : "";
+        console.log(
+          `No Claude Code sessions found${filterNote}.\n` +
+            `harnessc looks for session transcripts (*.jsonl files) under:\n` +
+            `  ${DEFAULT_CLAUDE_PROJECTS_DIR}\n` +
+            `Claude Code creates one there automatically each time you use it in a project.` +
+            (opts.project ? " Try without --project, or double-check the substring." : " Use it in a project, then run harnessc scan again."),
+        );
+        return;
+      }
+
       console.log(
         `${signals.sessionsScanned} session(s) scanned, ${signals.totalCandidates} failure-signal candidate(s) found across ${signals.candidatesBySession.size} session(s).`,
       );
       if (signals.candidatesBySession.size === 0) {
-        console.log("No sessions with failure signals in the selected range — nothing to report.");
+        console.log("No failure-signal candidates in the scanned sessions — nothing to report. Nice work!");
         return;
       }
 

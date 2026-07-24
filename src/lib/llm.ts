@@ -69,3 +69,12 @@ export function estimateCostUsd(usage: LlmUsage): number {
     (usage.completionTokens / 1_000_000) * OUTPUT_COST_PER_MILLION_USD
   );
 }
+
+// PRD §10: "API failure/rate limit -> retry once with backoff." Only network/API-level
+// failures wait here; a schema-mismatch retry (the model responded, just not validly)
+// retries immediately with a corrective prompt instead.
+export const RETRY_BACKOFF_MS = 500;
+
+export function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

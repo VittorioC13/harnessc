@@ -11,10 +11,13 @@ describe("cli", () => {
     expect(buildProgram().version()).toBe("0.1.0");
   });
 
-  it("scan reports nothing to do (and never reaches the API) when --project matches no sessions", async () => {
+  it("scan explains what it looked for and where (and never reaches the API) when --project matches nothing", async () => {
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
     await buildProgram().parseAsync(["node", "cli", "scan", "--project", "zzz-definitely-does-not-exist"]);
-    expect(logSpy).toHaveBeenCalledWith("No sessions with failure signals in the selected range — nothing to report.");
+    const printed = logSpy.mock.calls.map((call) => String(call[0])).join("\n");
+    expect(printed).toContain("No Claude Code sessions found");
+    expect(printed).toContain(".claude");
+    expect(printed).toContain("projects");
     logSpy.mockRestore();
   });
 });

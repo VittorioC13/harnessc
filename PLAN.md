@@ -98,9 +98,10 @@ his 5-minute sanity check.
 **VERIFY:** your own judgment + Han's reply.
 Status: pipeline judged against the rubric on available data — the 1 cluster this machine's real history produces ("Fails to check if CLI tools are installed before running them", 3x/2 sessions, real evidence, concrete fix) passes the specificity + evidence tests, not vague mush. Can't honestly claim a "top-5" judgment yet — only 2 real sessions exist on this machine (this project's own build history). Not checking this box: the GATE requires Han's reply, which only the operator can obtain.
 
-### [ ] 3.3 Edge cases + hardening — DRIVER: Claude Code
+### [x] 3.3 Edge cases + hardening — DRIVER: Claude Code
 Implement PRD §9 empty-state and §10 error handling: no transcripts found, missing API
 key, API failure mid-scan (partial results), huge transcript truncation.
+Status: done — empty-state message now explains what it looked for and where (`~/.claude/projects`) instead of just "0 sessions"; missing-key path already gave a clear message + exit 1 from task 2.1. Added real retry-with-backoff (500ms) for genuine API/network failures, distinct from the immediate schema-mismatch retry — partial results continue past a skipped session rather than crashing. Added a regression test proving the 40-candidates-per-session cap holds on a 60-failure fabricated transcript. All three VERIFY commands pass; the happy-path run produced a strong 5-cluster report from this project's own history.
 **VERIFY:** run these three and check each produces a friendly message, never a stack trace:
 `DEEPSEEK_API_KEY= node dist/cli.js scan` (missing key) ·
 `node dist/cli.js scan --project zzz-does-not-exist` (no sessions) ·

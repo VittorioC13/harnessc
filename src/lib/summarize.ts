@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { FailureCandidate } from "./signals.js";
-import { callJsonModel, estimateCostUsd, MissingApiKeyError, type LlmUsage } from "./llm.js";
+import { callJsonModel, estimateCostUsd, MissingApiKeyError, RETRY_BACKOFF_MS, sleep, type LlmUsage } from "./llm.js";
 
 export const FailureEventSchema = z.object({
   description: z.string().min(1),
@@ -64,14 +64,21 @@ export async function summarizeSession(candidates: FailureCandidate[]): Promise<
 
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
     const prompt = attempt === 0 ? basePrompt : retryPrompt(basePrompt);
+    let response;
     try {
-      const response = await callJsonModel(SYSTEM_PROMPT, prompt);
-      usage = addUsage(usage, response.usage);
+      response = await callJsonModel(SYSTEM_PROMPT, prompt);
+    } catch (err) {
+      if (err instanceof MissingApiKeyError) throw err;
+      lastError = err;
+      if (attempt < MAX_ATTEMPTS - 1) await sleep(RETRY_BACKOFF_MS);
+      continue;
+    }
+    usage = addUsage(usage, response.usage);
+    try {
       const parsed: unknown = JSON.parse(response.content);
       const { events } = ResponseSchema.parse(parsed);
       return { events, usage, costUsd: estimateCostUsd(usage), skipped: false };
     } catch (err) {
-      if (err instanceof MissingApiKeyError) throw err;
       lastError = err;
     }
   }

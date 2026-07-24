@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { copyFileSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
+import { copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -74,5 +74,35 @@ describe("extractSignals", () => {
     const result = await extractSignals({ baseDir, all: true });
     expect(result.sessionsScanned).toBe(3);
     expect(result.totalCandidates).toBe(4);
+  });
+
+  it("caps candidates at 40 per session even when a huge transcript has far more failures (PRD §7 Step B)", async () => {
+    const lines: string[] = [];
+    for (let i = 0; i < 60; i++) {
+      const ts = new Date(2026, 6, 1, 0, 0, i).toISOString();
+      lines.push(
+        JSON.stringify({
+          type: "assistant",
+          timestamp: ts,
+          sessionId: "ffff6666-0000-0000-0000-000000000006",
+          uuid: `a${i}`,
+          message: { role: "assistant", content: [{ type: "tool_use", id: `t${i}`, name: "Bash", input: { command: `cmd-${i}` } }] },
+        }),
+      );
+      lines.push(
+        JSON.stringify({
+          type: "user",
+          timestamp: ts,
+          sessionId: "ffff6666-0000-0000-0000-000000000006",
+          uuid: `u${i}`,
+          message: { role: "user", content: [{ type: "tool_result", tool_use_id: `t${i}`, is_error: true, content: `Error: failure number ${i}` }] },
+        }),
+      );
+    }
+    writeFileSync(join(baseDir, "-fake-project", "ffff6666-0000-0000-0000-000000000006.jsonl"), lines.join("\n"));
+
+    const result = await extractSignals({ baseDir, project: "fake-project", all: true });
+    const candidates = result.candidatesBySession.get("ffff6666-0000-0000-0000-000000000006") ?? [];
+    expect(candidates).toHaveLength(40);
   });
 });

@@ -10,6 +10,7 @@ const nodeGlobals = {
   __dirname: "readonly",
   __filename: "readonly",
   URL: "readonly",
+  setTimeout: "readonly",
 };
 
 export default [

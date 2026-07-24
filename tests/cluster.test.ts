@@ -110,4 +110,24 @@ describe("clusterFailureEvents", () => {
     await expect(clusterFailureEvents(events)).rejects.toBeInstanceOf(MissingApiKeyError);
     expect(mockedCallJsonModel).toHaveBeenCalledTimes(1);
   });
+
+  it("retries a genuine API failure with backoff and succeeds on the second attempt (PRD §10)", async () => {
+    mockedCallJsonModel
+      .mockRejectedValueOnce(new Error("429 rate limited"))
+      .mockResolvedValueOnce(jsonResponse([{ name: "Edits the wrong file", eventIndices: [2], suggestedFix: "n/a" }]));
+
+    const start = Date.now();
+    const result = await clusterFailureEvents(events);
+    expect(Date.now() - start).toBeGreaterThanOrEqual(490);
+    expect(result.skipped).toBe(false);
+    expect(result.clusters).toHaveLength(1);
+    expect(mockedCallJsonModel).toHaveBeenCalledTimes(2);
+  });
+
+  it("skips with partial results after a repeated API failure, without crashing", async () => {
+    mockedCallJsonModel.mockRejectedValue(new Error("500 internal error"));
+    const result = await clusterFailureEvents(events);
+    expect(result.skipped).toBe(true);
+    expect(result.warning).toContain("500 internal error");
+  });
 });

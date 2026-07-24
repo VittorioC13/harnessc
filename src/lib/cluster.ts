@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { callJsonModel, estimateCostUsd, MissingApiKeyError, type LlmUsage } from "./llm.js";
+import { callJsonModel, estimateCostUsd, MissingApiKeyError, RETRY_BACKOFF_MS, sleep, type LlmUsage } from "./llm.js";
 import type { FailureEvent } from "./summarize.js";
 
 export interface EventWithSession extends FailureEvent {
@@ -86,9 +86,17 @@ export async function clusterFailureEvents(events: EventWithSession[]): Promise<
 
   for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
     const prompt = attempt === 0 ? basePrompt : retryPrompt(basePrompt);
+    let response;
     try {
-      const response = await callJsonModel(SYSTEM_PROMPT, prompt);
-      usage = addUsage(usage, response.usage);
+      response = await callJsonModel(SYSTEM_PROMPT, prompt);
+    } catch (err) {
+      if (err instanceof MissingApiKeyError) throw err;
+      lastError = err;
+      if (attempt < MAX_ATTEMPTS - 1) await sleep(RETRY_BACKOFF_MS);
+      continue;
+    }
+    usage = addUsage(usage, response.usage);
+    try {
       const parsed: unknown = JSON.parse(response.content);
       const { clusters: rawClusters } = ResponseSchema.parse(parsed);
 
@@ -109,7 +117,6 @@ export async function clusterFailureEvents(events: EventWithSession[]): Promise<
 
       return { clusters, usage, costUsd: estimateCostUsd(usage), skipped: false };
     } catch (err) {
-      if (err instanceof MissingApiKeyError) throw err;
       lastError = err;
     }
   }
