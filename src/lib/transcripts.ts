@@ -10,6 +10,7 @@ const MESSAGE_TYPES = new Set(["user", "assistant"]);
 export interface SessionSummary {
   project: string;
   file: string;
+  filePath: string;
   sessionId: string;
   messageCount: number;
   malformedCount: number;
@@ -118,6 +119,7 @@ export async function discoverSessions(opts: DiscoverOptions = {}): Promise<Disc
       sessions.push({
         project,
         file,
+        filePath,
         sessionId: basename(file, ".jsonl"),
         messageCount: parsed.messageCount,
         malformedCount: parsed.malformedCount,

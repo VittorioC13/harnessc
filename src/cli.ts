@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { discoverSessions } from "./lib/transcripts.js";
+import { extractSignals } from "./lib/signals.js";
 import { renderTable } from "./lib/format.js";
 
 const VERSION = "0.1.0";
@@ -47,6 +48,26 @@ export function buildProgram(): Command {
       }
       if (result.totalMalformed > 0) {
         console.warn(`\nWarning: skipped ${result.totalMalformed} malformed line(s) across scanned sessions.`);
+      }
+    });
+
+  program
+    .command("debug:signals", { hidden: true })
+    .description("Extract local failure-signal candidates from session transcripts (no API calls)")
+    .option("--project <substring>", "filter by project directory name substring")
+    .option("--limit <n>", "limit to the N most recent sessions", (v) => parseInt(v, 10), 50)
+    .option("--all", "scan every session, ignoring --limit")
+    .action(async (opts: { project?: string; limit: number; all?: boolean }) => {
+      const result = await extractSignals(opts);
+      console.log(
+        `${result.totalCandidates} candidate(s) found across ${result.candidatesBySession.size} of ${result.sessionsScanned} session(s) scanned.`,
+      );
+      for (const [sessionId, candidates] of result.candidatesBySession) {
+        const project = candidates[0]?.project ?? "";
+        console.log(`\n${project} / ${sessionId}`);
+        for (const candidate of candidates) {
+          console.log(`  [${candidate.signalType}] ${candidate.timestamp.toISOString()}  ${candidate.excerpt}`);
+        }
       }
     });
 

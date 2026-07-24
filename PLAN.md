@@ -44,10 +44,11 @@ Status: done — `src/lib/transcripts.ts` discovers projects/sessions under `~/.
 **VERIFY:** `node dist/cli.js debug:sessions`
 → a table of your real projects and sessions with plausible counts and dates. No crash.
 
-### [ ] 1.2 Failure-signal extractor (no API) — DRIVER: Claude Code
+### [x] 1.2 Failure-signal extractor (no API) — DRIVER: Claude Code
 Implement PRD §7 Step B exactly (tool errors, user corrections, retry churn; caps;
 excerpt limits). Add `harnessc debug:signals [--project X] [--limit N]` printing candidates
 grouped by session with signal type labels. Tests against the fixtures.
+Status: done — `src/lib/signals.ts` implements all three signal types with 500-char excerpt cap and 40-candidates-per-session cap; hidden `debug:signals` command added; 7 tests against 5 fixtures. First run against real history had a real false-positive class (Read-tool doc dumps flagged for containing the word "error" as prose) — fixed by restricting free-text pattern matching to command-execution tools; see FAILURES.md. Judged 10 real candidates after the fix: 8/10 genuine.
 **VERIFY:** `node dist/cli.js debug:signals --limit 5`
 → printed candidates that genuinely look like failure moments (read 10 of them — do most
 correspond to real errors/corrections? If they're mostly noise, send it back with examples
