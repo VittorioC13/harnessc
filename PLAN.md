@@ -152,11 +152,12 @@ Status: `harnessc` was taken (unrelated project) — resolved to `harness-scan`,
 **VERIFY:** on your machine, in a fresh empty folder: `cd $(mktemp -d) && npx <final-name> scan --limit 5`
 → downloads from npm and produces a report.
 
-### [ ] 5.2 Website — DRIVER: Codex
+### [ ] 5.2 Website — DRIVER: Codex (IN PROGRESS — page built, deploy/Tally/video pending)
 Build PRD §11 as a single `site/index.html` (no framework): hero + copy-box + embedded
 video + 3 sections + Tally embed (create the form at tally.so first: fields = email only)
 + privacy line + GitHub link. Deploy: `cd site && vercel --prod`, then follow Vercel's
 dashboard to attach the purchased domain (Codex gives click-by-click instructions).
+Status: `site/index.html` built (no framework, plain HTML/CSS/JS, light+dark aware) with hero + copy-on-click command box + the 3 required sections (using a real excerpt from this project's own harness-report.md, not a mockup) + privacy line + GitHub link. Two pieces are clearly marked placeholders, not silently faked: the demo video (blocked on task 4.3) and the Tally waitlist embed (blocked on you creating the form at tally.so — I can't sign into a new external account on your behalf). Couldn't get a real browser screenshot in this environment (playwright's Chromium download was too slow over this sandbox's network); verified instead via structural checks (balanced HTML tags, valid inline JS) and careful manual review. Not running `vercel --prod` or attaching a domain — that's your account and a live public deployment.
 **VERIFY:** open the live URL on your phone: loads fast, video plays, the npx command
 copies on click, submitting a test email shows up in Tally's dashboard.
 
