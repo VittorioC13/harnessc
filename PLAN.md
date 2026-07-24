@@ -130,12 +130,13 @@ Status: done — based on the real #1 cluster ("Runs 'gh' command without instal
 deliberately-bad sample file (`npm run demo:fix-preview` or similar — agent's choice,
 but it must be one command you can run on camera).
 
-### [ ] 4.3 Demo video — DRIVER: Codex writes the script, you record
+### [ ] 4.3 Demo video — DRIVER: Codex writes the script, you record (IN PROGRESS — script done, blocked on you to record/upload)
 Codex drafts a 90-second shot-by-shot script: (1) the problem in one sentence, (2) run
 `npx harnessc scan` on real history, (3) scroll the report, zoom the #1 cluster,
 (4) show the fix-preview example firing, (5) the waitlist call-to-action. Record with
 QuickTime (Mac: File → New Screen Recording) or loom.com (free). 2–3 takes is enough;
 authentic beats polished.
+Status: wrote `DEMO-SCRIPT.md` myself (Codex substitute — I can't invoke it on your behalf) covering all 5 beats using this project's real artifacts. Not checking this box: the actual recording and upload is a human-only step I cannot perform. Record whenever you're ready, then tell me the video's under 2 minutes and where it's uploaded (YouTube unlisted / Loom link) and I'll check the box.
 **VERIFY:** the video is under 2 minutes, the report text is readable at normal size,
 and it's uploaded (YouTube unlisted or Loom link works).
 
