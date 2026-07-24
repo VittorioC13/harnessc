@@ -7,6 +7,7 @@ import { summarizeSession } from "./lib/summarize.js";
 import { clusterFailureEvents, type EventWithSession } from "./lib/cluster.js";
 import { renderTerminalReport, renderMarkdownReport } from "./lib/report.js";
 import { MissingApiKeyError } from "./lib/llm.js";
+import { Spinner } from "./lib/spinner.js";
 
 const VERSION = "0.1.0";
 
@@ -24,31 +25,52 @@ export function buildProgram(): Command {
     .option("--project <substring>", "filter by project directory name substring")
     .option("--limit <n>", "limit to the N most recent sessions", (v) => parseInt(v, 10), 50)
     .option("--all", "scan every session, ignoring --limit")
-    .action(async (opts: { project?: string; limit: number; all?: boolean }) => {
-      console.log("Locating and parsing Claude Code sessions...");
+    .option("--json", "print machine-readable JSON instead of the human report")
+    .action(async (opts: { project?: string; limit: number; all?: boolean; json?: boolean }) => {
+      const quiet = opts.json === true;
+      const log = quiet ? () => {} : console.log;
+
+      const locateSpinner = new Spinner("Locating and parsing Claude Code sessions...");
+      if (!quiet) locateSpinner.start();
       const signals = await extractSignals(opts);
+      if (!quiet) locateSpinner.stop();
 
       if (signals.sessionsScanned === 0) {
-        const filterNote = opts.project ? ` matching --project "${opts.project}"` : "";
-        console.log(
-          `No Claude Code sessions found${filterNote}.\n` +
-            `harnessc looks for session transcripts (*.jsonl files) under:\n` +
-            `  ${DEFAULT_CLAUDE_PROJECTS_DIR}\n` +
-            `Claude Code creates one there automatically each time you use it in a project.` +
-            (opts.project ? " Try without --project, or double-check the substring." : " Use it in a project, then run harnessc scan again."),
-        );
+        if (opts.json) {
+          console.log(JSON.stringify({ sessionsScanned: 0, totalFailureEvents: 0, costUsd: 0, clusters: [] }, null, 2));
+        } else {
+          const filterNote = opts.project ? ` matching --project "${opts.project}"` : "";
+          console.log(
+            `No Claude Code sessions found${filterNote}.\n` +
+              `harnessc looks for session transcripts (*.jsonl files) under:\n` +
+              `  ${DEFAULT_CLAUDE_PROJECTS_DIR}\n` +
+              `Claude Code creates one there automatically each time you use it in a project.` +
+              (opts.project ? " Try without --project, or double-check the substring." : " Use it in a project, then run harnessc scan again."),
+          );
+        }
         return;
       }
 
-      console.log(
+      log(
         `${signals.sessionsScanned} session(s) scanned, ${signals.totalCandidates} failure-signal candidate(s) found across ${signals.candidatesBySession.size} session(s).`,
       );
       if (signals.candidatesBySession.size === 0) {
-        console.log("No failure-signal candidates in the scanned sessions — nothing to report. Nice work!");
+        if (opts.json) {
+          console.log(
+            JSON.stringify(
+              { sessionsScanned: signals.sessionsScanned, totalFailureEvents: 0, costUsd: 0, clusters: [] },
+              null,
+              2,
+            ),
+          );
+        } else {
+          console.log("No failure-signal candidates in the scanned sessions — nothing to report. Nice work!");
+        }
         return;
       }
 
-      console.log("Summarizing sessions...");
+      const summarizeSpinner = new Spinner("Summarizing sessions...");
+      if (!quiet) summarizeSpinner.start();
       let totalCostUsd = 0;
       let skippedSessions = 0;
       const allEvents: EventWithSession[] = [];
@@ -59,6 +81,7 @@ export function buildProgram(): Command {
         try {
           result = await summarizeSession(candidates);
         } catch (err) {
+          if (!quiet) summarizeSpinner.stop();
           if (err instanceof MissingApiKeyError) {
             console.error(err.message);
             process.exitCode = 1;
@@ -75,13 +98,16 @@ export function buildProgram(): Command {
           allEvents.push({ ...event, sessionId, project });
         }
       }
-      console.log(`${allEvents.length} failure event(s) extracted.`);
+      if (!quiet) summarizeSpinner.stop();
+      log(`${allEvents.length} failure event(s) extracted.`);
 
-      console.log("Clustering failure events...");
+      const clusterSpinner = new Spinner("Clustering failure events...");
+      if (!quiet) clusterSpinner.start();
       let clusterResult;
       try {
         clusterResult = await clusterFailureEvents(allEvents);
       } catch (err) {
+        if (!quiet) clusterSpinner.stop();
         if (err instanceof MissingApiKeyError) {
           console.error(err.message);
           process.exitCode = 1;
@@ -89,6 +115,7 @@ export function buildProgram(): Command {
         }
         throw err;
       }
+      if (!quiet) clusterSpinner.stop();
       totalCostUsd += clusterResult.costUsd;
 
       if (clusterResult.skipped) {
@@ -102,8 +129,29 @@ export function buildProgram(): Command {
         clusters: clusterResult.clusters,
         costUsd: totalCostUsd,
       };
-      console.log(`\n${renderTerminalReport(reportData)}`);
       await writeFile("harness-report.md", renderMarkdownReport(reportData), "utf-8");
+
+      if (opts.json) {
+        const sortedDates = [...reportData.sessionDates].sort((a, b) => a.getTime() - b.getTime());
+        console.log(
+          JSON.stringify(
+            {
+              sessionsScanned: reportData.sessionsScanned,
+              dateRange: {
+                from: sortedDates[0]?.toISOString() ?? null,
+                to: sortedDates[sortedDates.length - 1]?.toISOString() ?? null,
+              },
+              totalFailureEvents: reportData.totalFailureEvents,
+              costUsd: reportData.costUsd,
+              clusters: reportData.clusters,
+            },
+            null,
+            2,
+          ),
+        );
+      } else {
+        console.log(`\n${renderTerminalReport(reportData)}`);
+      }
 
       if (skippedSessions > 0) {
         console.warn(`\nWarning: skipped ${skippedSessions} session(s) during summarization.`);

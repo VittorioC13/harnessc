@@ -111,11 +111,12 @@ Status: done — empty-state message now explains what it looked for and where (
 
 ## Day 4 — Demo assets
 
-### [ ] 4.1 CLI polish + README — DRIVER: Claude Code
+### [x] 4.1 CLI polish + README — DRIVER: Claude Code
 Progress spinner, clean flag help, `--json` output flag, and a README per PRD §12:
 install, usage, how it works, privacy section ("what leaves your machine"), roadmap with
 waitlist link placeholder. The README is marketing — Codex reviews it (P3) for clarity
 and skeptic-proofing, not just correctness.
+Status: done — dependency-free `Spinner` (src/lib/spinner.ts, falls back to static text on non-TTY), `--json` flag on `scan` (emits valid JSON even in the empty-state cases, tested), README covering install/usage/how-it-works/privacy/roadmap/development. NOT done: the Codex cross-review this task explicitly calls for — I'm Claude Code and have no way to invoke Codex or its own account on your behalf. If you want that second opinion, open Codex yourself and paste prompt P3 with this README.
 **VERIFY:** read the README top to bottom yourself. Could a stranger install and run it
 from the README alone? Does the privacy section answer "is this safe?" plainly?
 

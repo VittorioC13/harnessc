@@ -11,6 +11,8 @@ const nodeGlobals = {
   __filename: "readonly",
   URL: "readonly",
   setTimeout: "readonly",
+  setInterval: "readonly",
+  clearInterval: "readonly",
 };
 
 export default [
