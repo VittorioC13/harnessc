@@ -67,9 +67,10 @@ Status: done — `src/lib/llm.ts` (openai SDK against DeepSeek, model `deepseek-
 name commands/files/functions). Cost note prints. If descriptions are generic, apply the
 Day-3 rubric early and iterate with P8.
 
-### [ ] 2.2 Cross-session clustering + end-to-end scan — DRIVER: Claude Code
+### [x] 2.2 Cross-session clustering + end-to-end scan — DRIVER: Claude Code
 Implement PRD §7 Step D and wire the full `scan` command: A→B→C→D, printing progress.
 Raw cluster output can be ugly for now (rendering is 3.1).
+Status: done — `src/lib/cluster.ts` clusters events by having the LLM return event indices per cluster (not LLM-reported counts), then computes count/sessionsAffected/evidence deterministically from the actual underlying events — avoids trusting the model's own arithmetic. Full `scan` command wired A→B→C→D with progress lines. Real run: 2 sessions, 29 candidates, 10 events, 1 cluster ("Uses system commands without verifying they are installed", 3x/2 sessions), cost $0.0021.
 **VERIFY:** `node dist/cli.js scan --limit 20`
 → completes without crashing, prints named clusters with counts. Note the total cost
 printed — it should be well under $1 for 20 sessions.

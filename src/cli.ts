@@ -3,6 +3,7 @@ import { discoverSessions } from "./lib/transcripts.js";
 import { extractSignals } from "./lib/signals.js";
 import { renderTable } from "./lib/format.js";
 import { summarizeSession } from "./lib/summarize.js";
+import { clusterFailureEvents, type EventWithSession } from "./lib/cluster.js";
 import { MissingApiKeyError } from "./lib/llm.js";
 
 const VERSION = "0.1.0";
@@ -18,8 +19,80 @@ export function buildProgram(): Command {
   program
     .command("scan")
     .description("Scan local Claude Code session history for recurring failures")
-    .action(() => {
-      console.log("scan: not implemented yet");
+    .option("--project <substring>", "filter by project directory name substring")
+    .option("--limit <n>", "limit to the N most recent sessions", (v) => parseInt(v, 10), 50)
+    .option("--all", "scan every session, ignoring --limit")
+    .action(async (opts: { project?: string; limit: number; all?: boolean }) => {
+      console.log("Locating and parsing Claude Code sessions...");
+      const signals = await extractSignals(opts);
+      console.log(
+        `${signals.sessionsScanned} session(s) scanned, ${signals.totalCandidates} failure-signal candidate(s) found across ${signals.candidatesBySession.size} session(s).`,
+      );
+      if (signals.candidatesBySession.size === 0) {
+        console.log("No sessions with failure signals in the selected range — nothing to report.");
+        return;
+      }
+
+      console.log("Summarizing sessions...");
+      let totalCostUsd = 0;
+      let skippedSessions = 0;
+      const allEvents: EventWithSession[] = [];
+
+      for (const [sessionId, candidates] of signals.candidatesBySession) {
+        const project = candidates[0]?.project ?? "";
+        let result;
+        try {
+          result = await summarizeSession(candidates);
+        } catch (err) {
+          if (err instanceof MissingApiKeyError) {
+            console.error(err.message);
+            process.exitCode = 1;
+            return;
+          }
+          throw err;
+        }
+        totalCostUsd += result.costUsd;
+        if (result.skipped) {
+          skippedSessions++;
+          continue;
+        }
+        for (const event of result.events) {
+          allEvents.push({ ...event, sessionId, project });
+        }
+      }
+      console.log(`${allEvents.length} failure event(s) extracted.`);
+
+      console.log("Clustering failure events...");
+      let clusterResult;
+      try {
+        clusterResult = await clusterFailureEvents(allEvents);
+      } catch (err) {
+        if (err instanceof MissingApiKeyError) {
+          console.error(err.message);
+          process.exitCode = 1;
+          return;
+        }
+        throw err;
+      }
+      totalCostUsd += clusterResult.costUsd;
+
+      if (clusterResult.skipped) {
+        console.warn(`\nClustering skipped: ${clusterResult.warning}`);
+      } else if (clusterResult.clusters.length === 0) {
+        console.log("\nNo recurring failure clusters found.");
+      } else {
+        console.log(`\n${clusterResult.clusters.length} cluster(s) found:\n`);
+        clusterResult.clusters.forEach((cluster, i) => {
+          console.log(
+            `#${i + 1}  ${cluster.name}  (${cluster.count}x across ${cluster.sessionsAffected} session(s), severity ${cluster.topSeverity})`,
+          );
+        });
+      }
+
+      console.log(`\nEstimated total cost: $${totalCostUsd.toFixed(4)}`);
+      if (skippedSessions > 0) {
+        console.warn(`Warning: skipped ${skippedSessions} session(s) during summarization.`);
+      }
     });
 
   program

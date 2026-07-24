@@ -11,10 +11,10 @@ describe("cli", () => {
     expect(buildProgram().version()).toBe("0.1.0");
   });
 
-  it("prints a stub message for the scan command", async () => {
+  it("scan reports nothing to do (and never reaches the API) when --project matches no sessions", async () => {
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
-    await buildProgram().parseAsync(["node", "cli", "scan"]);
-    expect(logSpy).toHaveBeenCalledWith("scan: not implemented yet");
+    await buildProgram().parseAsync(["node", "cli", "scan", "--project", "zzz-definitely-does-not-exist"]);
+    expect(logSpy).toHaveBeenCalledWith("No sessions with failure signals in the selected range — nothing to report.");
     logSpy.mockRestore();
   });
 });
