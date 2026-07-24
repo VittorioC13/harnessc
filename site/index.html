@@ -100,19 +100,62 @@
   section.pitch h2 { font-size: 1.5rem; margin: 0 0 0.6rem; }
   section.pitch p { color: var(--muted); max-width: 560px; }
 
-  pre.report {
-    background: var(--code-bg);
-    color: var(--code-fg);
+  .terminal-window {
+    max-width: 640px;
+    margin: 0 auto 0.75rem;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #1b1d23;
     border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 1rem 1.1rem;
-    overflow-x: auto;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size: 0.82rem;
-    line-height: 1.55;
   }
-  pre.report .sev { color: var(--severity); }
-  pre.report .muted { color: var(--muted); }
+  .terminal-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 0.75rem;
+    background: #24262d;
+  }
+  .terminal-titlebar .dot { width: 0.65rem; height: 0.65rem; border-radius: 50%; display: inline-block; }
+  .dot-red { background: #ff5f57; }
+  .dot-yellow { background: #febc2e; }
+  .dot-green { background: #28c840; }
+  .terminal-titlebar .terminal-title {
+    margin-left: 0.5rem;
+    color: #9a9ca3;
+    font-size: 0.8rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  pre.terminal-body {
+    margin: 0;
+    padding: 1.1rem 1.2rem;
+    color: #e6e6e6;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    min-height: 12rem;
+  }
+  .terminal-cursor {
+    display: inline-block;
+    width: 0.5em;
+    background: #e6e6e6;
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  .demo-caption { text-align: center; color: var(--muted); font-size: 0.85rem; margin: 0 0 1rem; }
+  .replay-btn {
+    display: block;
+    margin: 0 auto 2rem;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 6px;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+  }
+  .replay-btn:hover { color: var(--fg); border-color: var(--accent); }
 
   .waitlist { margin-top: 1.25rem; }
   .waitlist-embed {
@@ -167,19 +210,37 @@
 
     <section class="pitch">
       <h2>See them ranked with evidence</h2>
-      <p>This is a real result from <code>harness-scan</code>'s own build history — not a mockup:</p>
-      <pre class="report">harness-scan report — 2 sessions scanned (Jul 23 – Jul 24), 8 failure events
-Estimated cost: $0.0025
+      <p>
+        This is a real, unedited run of <code>harness-scan</code> against its own build
+        history — not a mockup, not staged copy:
+      </p>
+      <div class="terminal-window">
+        <div class="terminal-titlebar">
+          <span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+          <span class="terminal-title">zsh</span>
+        </div>
+        <pre class="terminal-body" id="terminal-output" aria-live="polite">$ npx harness-scan scan
+Locating and parsing Claude Code sessions...
+2 session(s) scanned, 43 failure-signal candidate(s) found across 2 session(s).
+Summarizing sessions...
+9 failure event(s) extracted.
+Clustering failure events...
 
- #1  Runs 'gh' command without ensuring it is installed          <span class="sev">2× · 2 sessions</span>
-     "(eval):1: command not found: gh; Error: A `brew install gh`
-     process has already locked..."
-     Suggested harness fix: Add a pre-check in your workflow that verifies
-     required CLI tools are installed; use a script or a CI step to install
-     missing tools automatically. Consider adding a prerequisite check in
-     the repository's setup script.
+harness-scan report — 2 sessions scanned (Jul 23 – Jul 24), 9 failure events
+Estimated cost: $0.0021
 
-<span class="muted">Full details: harness-report.md</span></pre>
+ #1  Verify that required command-line tools (gh, codex) are installed before using them   3× · 2 sessions
+     "(eval):1: command not found: gh"
+     Suggested harness fix: Add a pre-flight check in the agent's initialization script to verify that
+     necessary CLI tools (like gh, codex) are installed. In AGENTS.md, include a
+     reminder to always run `which &lt;tool&gt;` before attempting to use a
+     command-line tool. Additionally, consider using a tool like `command -v` to
+     check availability and provide a clear error message if missing.
+
+Full details: harness-report.md</pre>
+      </div>
+      <p class="demo-caption">Captured verbatim from a real run — see it for yourself: <code>npx harness-scan scan</code></p>
+      <button id="replay-btn" type="button" class="replay-btn">▸ Replay</button>
     </section>
 
     <section class="pitch">
@@ -225,6 +286,63 @@ Estimated cost: $0.0025
         },
       );
     });
+  </script>
+
+  <script>
+    (function () {
+      var el = document.getElementById("terminal-output");
+      if (!el) return;
+      var fullText = el.textContent;
+      var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var replayBtn = document.getElementById("replay-btn");
+      var playing = false;
+
+      function type(text, i, cursor) {
+        if (i > text.length) {
+          if (cursor) cursor.remove();
+          playing = false;
+          return;
+        }
+        el.textContent = text.slice(0, i);
+        if (cursor) el.appendChild(cursor);
+        // A few chars at a time reads naturally without taking forever on ~700 characters.
+        window.setTimeout(function () { type(text, i + 2, cursor); }, 8);
+      }
+
+      function play() {
+        if (playing) return;
+        playing = true;
+        if (reduceMotion) {
+          el.textContent = fullText;
+          playing = false;
+          return;
+        }
+        var cursor = document.createElement("span");
+        cursor.className = "terminal-cursor";
+        cursor.textContent = " ";
+        el.textContent = "";
+        type(fullText, 0, cursor);
+      }
+
+      if (replayBtn) replayBtn.addEventListener("click", play);
+
+      if ("IntersectionObserver" in window) {
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                play();
+                observer.disconnect();
+              }
+            });
+          },
+          { threshold: 0.4 },
+        );
+        observer.observe(el);
+      } else {
+        play();
+      }
+    })();
   </script>
 </body>
 </html>
