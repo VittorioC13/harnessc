@@ -1,0 +1,6 @@
+{"type":"mode","timestamp":null,"sessionId":"aaaa1111-0000-0000-0000-000000000001","uuid":null,"message":null}
+{"type":"user","timestamp":"2026-07-20T10:00:00.000Z","sessionId":"aaaa1111-0000-0000-0000-000000000001","uuid":"u1","message":{"role":"user","content":"fix the login bug"}}
+{"type":"assistant","timestamp":"2026-07-20T10:00:05.000Z","sessionId":"aaaa1111-0000-0000-0000-000000000001","uuid":"a1","message":{"role":"assistant","content":[{"type":"text","text":"Looking into it."},{"type":"tool_use","id":"t1","name":"Bash","input":{"command":"npm test"}}]}}
+{"type":"user","timestamp":"2026-07-20T10:00:06.000Z","sessionId":"aaaa1111-0000-0000-0000-000000000001","uuid":"u2","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t1","is_error":false,"content":"3 passing"}]}}
+{"type":"assistant","timestamp":"2026-07-20T10:00:10.000Z","sessionId":"aaaa1111-0000-0000-0000-000000000001","uuid":"a2","message":{"role":"assistant","content":[{"type":"text","text":"Fixed it, tests pass."}]}}
+{"type":"system","subtype":"turn_duration","durationMs":10000,"messageCount":4,"timestamp":"2026-07-20T10:00:10.500Z","sessionId":"aaaa1111-0000-0000-0000-000000000001","uuid":"s1"}

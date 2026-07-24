@@ -1,0 +1,6 @@
+{"type":"user","timestamp":"2026-07-21T09:00:00.000Z","sessionId":"bbbb2222-0000-0000-0000-000000000002","uuid":"u1","message":{"role":"user","content":"why does the build fail"}}
+{this is not valid json,,,
+{"type":"assistant","timestamp":"2026-07-21T09:00:03.000Z","sessionId":"bbbb2222-0000-0000-0000-000000000002","uuid":"a1","message":{"role":"assistant","content":[{"type":"text","text":"Checking the CI logs."}]}}
+{"noTypeField":true,"timestamp":"2026-07-21T09:00:04.000Z"}
+{"type":"future-line-kind-we-dont-know-about","timestamp":"2026-07-21T09:00:05.000Z","sessionId":"bbbb2222-0000-0000-0000-000000000002"}
+{"type":"user","timestamp":"2026-07-21T09:00:06.000Z","sessionId":"bbbb2222-0000-0000-0000-000000000002","uuid":"u2","message":{"role":"user","content":"no, still failing"}}

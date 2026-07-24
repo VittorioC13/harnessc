@@ -34,12 +34,13 @@ Status: done — TypeScript strict CLI scaffolded with commander/tsup/vitest/esl
 
 ## Day 1 — Read the transcripts
 
-### [ ] 1.1 Transcript locator + parser — DRIVER: Claude Code
+### [x] 1.1 Transcript locator + parser — DRIVER: Claude Code
 Implement PRD §7 Step A. Include a hidden debug command `harnessc debug:sessions` that
 lists discovered projects and sessions (project name, session file, message count, date).
 Must skip malformed lines with a counted warning. Tests: include 2–3 small fixture JSONL
 files in `tests/fixtures/` (the agent fabricates realistic ones based on the real format
 it inspects in `~/.claude/projects/`).
+Status: done — `src/lib/transcripts.ts` discovers projects/sessions under `~/.claude/projects/`, tolerates malformed lines (counted, not fatal), supports `--project`/`--limit`/`--all`; hidden `debug:sessions` command added; 6 new tests against 3 fabricated fixtures, all passing. Ran against real history: 2 projects, 2 sessions, 443 messages found, no crash.
 **VERIFY:** `node dist/cli.js debug:sessions`
 → a table of your real projects and sessions with plausible counts and dates. No crash.
 
