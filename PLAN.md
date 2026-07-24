@@ -161,13 +161,14 @@ Status: `site/index.html` built (no framework, plain HTML/CSS/JS, light+dark awa
 **VERIFY:** open the live URL on your phone: loads fast, video plays, the npx command
 copies on click, submitting a test email shows up in Tally's dashboard.
 
-### [ ] 5.3 Pre-launch checklist — DRIVER: Codex (fresh eyes on Claude Code's product)
+### [ ] 5.3 Pre-launch checklist — DRIVER: Codex (fresh eyes on Claude Code's product) (IN PROGRESS — self-reviewed, not independently by Codex)
 Codex must verify and report on each, with evidence: (a) grep the entire codebase for
 network calls — confirm api.deepseek.com is the only destination; (b) confirm no
 telemetry/analytics anywhere including the website beyond Vercel defaults; (c) run the
 full test suite and CI; (d) re-run the three edge-case commands from 3.3; (e) read the
 README as a hostile HN commenter and list the top 5 questions/objections it fails to
 answer — Claude Code then patches the README.
+Status: I did (a)-(e) myself since I can't invoke Codex — NOT the independent "fresh eyes" the task calls for, flagging that honestly. (a) PASS: only api.deepseek.com, grep found nothing else. (b) PASS: no telemetry/analytics keywords anywhere. (c) PASS: typecheck/lint/50 tests/build/CI all green. (d) PASS: all three edge cases still clean. (e) found 5 real gaps, patched README for 3 (DeepSeek/China disclosure, cost-at-scale, LLM-can-misjudge caveat) and honestly flagged 2 as needing your decision rather than silently patching: no LICENSE file (the "open source" claim isn't backed by one) and no secret-redaction step (excerpts are verbatim from tool output — a printed secret could reach DeepSeek and harness-report.md). Not checking this box or sending anything to Han — that PASS needs to come from an actual independent reviewer.
 **VERIFY:** Codex's written checklist report, all items PASS. Send it to Han (2-min read).
 
 ---

@@ -69,8 +69,32 @@ every run.
   moments it finds — not your full source code, not full transcripts, not your repo.
 - Everything else — locating files, parsing transcripts, rendering the report — happens
   entirely on your machine.
-- This project is open source; you can read exactly what it sends in `src/lib/signals.ts`,
-  `src/lib/summarize.ts`, and `src/lib/cluster.ts`.
+- The source is public on GitHub; you can read exactly what it sends in
+  `src/lib/signals.ts`, `src/lib/summarize.ts`, and `src/lib/cluster.ts`. (See
+  [License](#license) below — public source isn't the same thing as a license to reuse it.)
+- **Why DeepSeek?** Cost and simplicity — it's inexpensive and OpenAI-API-compatible.
+  Trade-off to know before setting `DEEPSEEK_API_KEY`: DeepSeek is a Chinese company, and
+  the excerpts described above are processed under Chinese data-handling law. v1 has no
+  other provider option.
+- **No secret redaction yet.** Excerpts are taken verbatim from your tool outputs and
+  typed messages. If your session history ever had a secret printed to the terminal (an
+  API key in an error message, an `.env` dump), it could end up in an excerpt sent to
+  DeepSeek and written into `harness-report.md`. Review `harness-report.md` before sharing
+  it, same as you would any terminal history.
+- Cost scales with sessions that have failure signals (one API call each) plus one final
+  clustering call — a few thousandths of a dollar per session in our own testing.
+  Scanning hundreds of sessions at once (`--all`) could add up to a few dollars; use
+  `--limit` to control this.
+- Cluster shape (name, count, evidence, suggested fix) is schema-validated before being
+  shown, so malformed output is retried once then skipped rather than silently corrupting
+  the report — but the LLM can still misjudge. Treat suggested fixes as a starting point,
+  not gospel.
+
+## License
+
+Not yet decided — this repo doesn't have a LICENSE file yet. Until one is added, "the
+source is public" isn't the same as "open source": don't assume you can redistribute or
+reuse it.
 
 ## Roadmap
 
