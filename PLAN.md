@@ -86,7 +86,7 @@ Status: done — `src/lib/report.ts` renders both the terminal report (header wi
 **VERIFY:** `node dist/cli.js scan --limit 30 && cat harness-report.md`
 → terminal output visually matches PRD §8; the markdown file contains the same content.
 
-### [ ] 3.2 Quality iteration — DRIVER: Claude Code, using prompt P8 repeatedly
+### [ ] 3.2 Quality iteration — DRIVER: Claude Code, using prompt P8 repeatedly (IN PROGRESS — blocked on Han's reply, see status)
 Run `scan` over your full history (`--all` if affordable, else `--limit 100`). Judge every
 top-5 cluster against the rubric in START-HERE.md. For each failure of the rubric, use P8:
 paste the bad cluster, state which rule it breaks, let the agent improve the Step C/D
@@ -96,6 +96,7 @@ that is expected and is the highest-value work of the week.
 report makes you think "a developer would screenshot this." Send the report to Han for
 his 5-minute sanity check.
 **VERIFY:** your own judgment + Han's reply.
+Status: pipeline judged against the rubric on available data — the 1 cluster this machine's real history produces ("Fails to check if CLI tools are installed before running them", 3x/2 sessions, real evidence, concrete fix) passes the specificity + evidence tests, not vague mush. Can't honestly claim a "top-5" judgment yet — only 2 real sessions exist on this machine (this project's own build history). Not checking this box: the GATE requires Han's reply, which only the operator can obtain.
 
 ### [ ] 3.3 Edge cases + hardening — DRIVER: Claude Code
 Implement PRD §9 empty-state and §10 error handling: no transcripts found, missing API
