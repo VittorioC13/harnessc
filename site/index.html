@@ -8,22 +8,25 @@
 <meta property="og:title" content="harness-scan — Lighthouse for your coding agent" />
 <meta property="og:description" content="Your coding agent repeats its mistakes. harness-scan finds them, ranked, with evidence." />
 <meta property="og:type" content="website" />
-<meta name="theme-color" content="#0a0c12" />
+<meta name="theme-color" content="#faf7f2" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔦</text></svg>" />
 <style>
   :root {
-    --bg: #0a0c12;
-    --bg-card: #12151d;
-    --bg-card-hover: #171b25;
-    --fg: #f2f4f8;
-    --muted: #8a93a6;
-    --border: rgba(255, 255, 255, 0.09);
-    --border-strong: rgba(255, 255, 255, 0.16);
-    --gold-1: #ffd873;
-    --gold-2: #f2b344;
-    --gold-3: #ff8a3d;
-    --blue-glow: #3d6bff;
-    --warn: #f2b344;
+    --bg: #faf7f2;
+    --bg-blush: #f4e9e3;
+    --bg-black: #16130f;
+    --fg: #19160f;
+    --fg-on-black: #f3ece1;
+    --muted: #6b6558;
+    --muted-on-black: #a89f8f;
+    --border: rgba(20, 16, 8, 0.1);
+    --border-strong: rgba(20, 16, 8, 0.18);
+    --border-on-black: rgba(255, 255, 255, 0.14);
+    --coral: #d9704f;
+    --green: #3f6b4d;
+    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Times New Roman", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   }
 
   * { box-sizing: border-box; }
@@ -32,209 +35,185 @@
   body {
     background: var(--bg);
     color: var(--fg);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    line-height: 1.55;
-    position: relative;
-    overflow-x: hidden;
+    font-family: var(--serif);
+    line-height: 1.6;
   }
+  a { color: var(--coral); text-decoration: none; }
+  a:hover { text-decoration: underline; }
 
-  /* Dot-grid texture across the whole page */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background-image: radial-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px);
-    background-size: 26px 26px;
-    pointer-events: none;
-    z-index: 0;
-  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 1.5rem; }
+  .measure { max-width: 640px; }
 
-  /* Lighthouse-beam glow blobs, slow drift */
-  .glow {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(90px);
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.5;
+  /* ---------- Nav ---------- */
+  nav.topbar {
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
   }
-  .glow-gold {
-    width: 640px;
-    height: 640px;
-    top: -220px;
-    left: 50%;
-    margin-left: -320px;
-    background: radial-gradient(circle, var(--gold-2), transparent 70%);
-    animation: drift1 22s ease-in-out infinite alternate;
-  }
-  .glow-blue {
-    width: 520px;
-    height: 520px;
-    top: 30%;
-    right: -220px;
-    background: radial-gradient(circle, var(--blue-glow), transparent 70%);
-    opacity: 0.25;
-    animation: drift2 26s ease-in-out infinite alternate;
-  }
-  @keyframes drift1 {
-    from { transform: translate(-30px, 0) scale(1); }
-    to { transform: translate(30px, 40px) scale(1.08); }
-  }
-  @keyframes drift2 {
-    from { transform: translate(0, -20px) scale(1); }
-    to { transform: translate(-40px, 30px) scale(1.1); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .glow-gold, .glow-blue { animation: none; }
-  }
-
-  .wrap { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 0 1.25rem; }
-
-  .pill-row {
+  nav.topbar .wrap {
     display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1.75rem;
-  }
-  .pill {
-    display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    font-size: 0.78rem;
-    color: var(--muted);
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    padding: 0.3rem 0.85rem;
+    justify-content: space-between;
+    padding-top: 1.1rem;
+    padding-bottom: 1.1rem;
   }
-
-  header.hero { padding: 5.5rem 0 3.5rem; text-align: center; }
-  h1 {
-    font-size: clamp(2.75rem, 8vw, 4.75rem);
+  .wordmark {
+    font-family: var(--sans);
     font-weight: 800;
-    margin: 0 0 0.6rem;
-    letter-spacing: -0.03em;
-    line-height: 1.02;
-    background: linear-gradient(135deg, var(--gold-1), var(--gold-2) 45%, var(--gold-3));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    font-size: 1.15rem;
+    letter-spacing: -0.02em;
+    color: var(--fg);
   }
-  .tagline { font-size: 1.2rem; color: var(--muted); margin: 0 0 1.5rem; }
-  .oneliner { max-width: 540px; margin: 0 auto 2.25rem; color: #c7cddb; font-size: 1.02rem; }
+  nav.topbar a.gh {
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--fg);
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    padding: 0.45rem 1.1rem;
+  }
+  nav.topbar a.gh:hover { background: var(--fg); color: var(--bg); text-decoration: none; }
+
+  /* ---------- Hero ---------- */
+  header.hero { padding: 5rem 0 3rem; text-align: center; }
+  .eyebrow {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+  h1 {
+    font-family: var(--sans);
+    font-size: clamp(2.5rem, 7vw, 4.2rem);
+    font-weight: 800;
+    margin: 0 0 0.75rem;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    color: var(--fg);
+  }
+  .tagline { font-size: 1.2rem; color: var(--muted); margin: 0 0 1.5rem; font-style: italic; }
+  .oneliner { max-width: 560px; margin: 0 auto 2.25rem; font-size: 1.08rem; }
+
+  .cta-row { display: flex; justify-content: center; align-items: center; gap: 0.85rem; flex-wrap: wrap; }
 
   .cmdbox {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    max-width: 440px;
-    margin: 0 auto;
-    background: var(--bg-card);
-    border: 1px solid var(--border-strong);
-    border-radius: 10px;
-    padding: 0.7rem 0.7rem 0.7rem 1.1rem;
-    box-shadow: 0 0 0 1px rgba(242, 179, 68, 0.08), 0 8px 30px -12px rgba(242, 179, 68, 0.25);
+    background: var(--fg);
+    border-radius: 8px;
+    padding: 0.65rem 0.65rem 0.65rem 1.1rem;
   }
   .cmdbox code {
-    flex: 1;
-    text-align: left;
-    color: var(--fg);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family: var(--mono);
     font-size: 0.95rem;
+    color: #f3ece1;
     white-space: nowrap;
-    overflow-x: auto;
   }
-  .cmdbox code::before { content: "$ "; color: var(--gold-2); }
+  .cmdbox code::before { content: "$ "; color: var(--coral); }
   .cmdbox button {
-    flex-shrink: 0;
-    background: linear-gradient(135deg, var(--gold-2), var(--gold-3));
-    color: #1a1206;
-    font-weight: 600;
+    font-family: var(--sans);
+    background: #f3ece1;
+    color: var(--fg);
+    font-weight: 700;
     border: none;
-    border-radius: 7px;
+    border-radius: 6px;
     padding: 0.5rem 0.9rem;
     font-size: 0.85rem;
     cursor: pointer;
-    transition: filter 0.15s, transform 0.15s;
   }
-  .cmdbox button:hover { filter: brightness(1.08); transform: translateY(-1px); }
-  .cmdbox button:active { transform: translateY(0); }
+  .cmdbox button:hover { opacity: 0.85; }
 
-  .reveal {
-    opacity: 0;
-    transform: translateY(18px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
+  .btn-outline {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--fg);
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 0.65rem 1.2rem;
   }
+  .btn-outline:hover { background: var(--bg-blush); text-decoration: none; }
+
+  .credibility {
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+    margin: 3rem 0 0;
+  }
+
+  .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
   .reveal.is-visible { opacity: 1; transform: none; }
-  @media (prefers-reduced-motion: reduce) {
-    .reveal { opacity: 1; transform: none; transition: none; }
-  }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
 
-  video, .video-placeholder {
-    display: block;
-    width: 100%;
-    max-width: 640px;
-    margin: 0 auto 3.5rem;
-    border-radius: 14px;
-    border: 1px solid var(--border);
-    background: var(--bg-card);
-  }
   .video-placeholder {
-    aspect-ratio: 16 / 9;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
+    max-width: 720px;
+    aspect-ratio: 16 / 9;
+    margin: 3rem auto;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-blush);
     color: var(--muted);
+    font-family: var(--sans);
     font-size: 0.95rem;
   }
 
-  section.pitch {
-    position: relative;
-    margin: 4.5rem 0;
-    padding: 2.25rem 2rem;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    overflow: hidden;
+  /* ---------- Two-column sections ---------- */
+  section.split {
+    padding: 4.5rem 0;
+    border-top: 1px solid var(--border);
   }
-  section.pitch .ghost-num {
-    position: absolute;
-    top: -0.6rem;
-    right: 1rem;
-    font-size: 6.5rem;
+  section.split.blush { background: var(--bg-blush); }
+  .split-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+  }
+  @media (max-width: 720px) {
+    .split-grid { grid-template-columns: 1fr; gap: 1.25rem; }
+  }
+  section.split h2 {
+    font-family: var(--sans);
+    font-size: clamp(1.75rem, 4vw, 2.4rem);
     font-weight: 800;
-    color: rgba(255, 255, 255, 0.045);
-    line-height: 1;
-    pointer-events: none;
-    user-select: none;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin: 0;
   }
-  section.pitch h2 { font-size: 1.4rem; margin: 0 0 0.7rem; letter-spacing: -0.01em; }
-  section.pitch p { color: var(--muted); max-width: 560px; position: relative; }
-  section.pitch code {
-    background: rgba(255, 255, 255, 0.07);
+  section.split .body-col p { margin: 0 0 1rem; color: var(--fg); }
+  section.split .body-col code {
+    background: rgba(20, 16, 8, 0.06);
     border-radius: 4px;
     padding: 0.1rem 0.4rem;
-    font-size: 0.9em;
-    color: var(--gold-1);
+    font-family: var(--mono);
+    font-size: 0.88em;
   }
 
+  /* ---------- Terminal demo card ---------- */
   .terminal-window {
-    max-width: 100%;
-    margin: 1.25rem 0 0.85rem;
-    border-radius: 12px;
+    margin-top: 1.5rem;
+    border-radius: 10px;
     overflow: hidden;
-    background: #0d0f14;
-    border: 1px solid var(--border-strong);
-    box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(242, 179, 68, 0.06);
+    background: #16181d;
+    box-shadow: 0 24px 50px -24px rgba(20, 16, 8, 0.35);
   }
   .terminal-titlebar {
     display: flex;
     align-items: center;
     gap: 0.4rem;
     padding: 0.6rem 0.8rem;
-    background: #16191f;
-    border-bottom: 1px solid var(--border);
+    background: #e9e2d8;
   }
   .terminal-titlebar .dot { width: 0.65rem; height: 0.65rem; border-radius: 50%; display: inline-block; }
   .dot-red { background: #ff5f57; }
@@ -242,30 +221,26 @@
   .dot-green { background: #28c840; }
   .terminal-titlebar .terminal-title {
     margin-left: 0.5rem;
-    color: #7c8393;
+    color: #6b6558;
     font-size: 0.78rem;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family: var(--mono);
   }
   pre.terminal-body {
     margin: 0;
     padding: 1.15rem 1.25rem;
-    color: #dfe3ea;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    color: #e3e6ea;
+    font-family: var(--mono);
     font-size: 0.78rem;
     line-height: 1.65;
     overflow-x: auto;
     white-space: pre-wrap;
     min-height: 13rem;
   }
-  .terminal-cursor {
-    display: inline-block;
-    width: 0.5em;
-    background: var(--gold-2);
-    animation: blink 1s steps(1) infinite;
-  }
+  .terminal-cursor { display: inline-block; width: 0.5em; background: var(--coral); animation: blink 1s steps(1) infinite; }
   @keyframes blink { 50% { opacity: 0; } }
-  .demo-caption { color: var(--muted); font-size: 0.85rem; margin: 0 0 1rem; }
+  .demo-caption { font-family: var(--sans); color: var(--muted); font-size: 0.85rem; margin: 0.85rem 0 0.75rem; }
   .replay-btn {
+    font-family: var(--sans);
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
@@ -276,55 +251,69 @@
     padding: 0.4rem 0.95rem;
     font-size: 0.8rem;
     cursor: pointer;
-    transition: color 0.15s, border-color 0.15s;
   }
-  .replay-btn:hover { color: var(--gold-1); border-color: var(--gold-2); }
+  .replay-btn:hover { color: var(--fg); border-color: var(--fg); }
 
-  .waitlist { margin-top: 1.25rem; }
+  /* ---------- Black contrast section ---------- */
+  section.dark {
+    background: var(--bg-black);
+    color: var(--fg-on-black);
+    padding: 5rem 0;
+  }
+  section.dark h2 { color: var(--fg-on-black); }
+  section.dark .body-col p { color: var(--muted-on-black); }
+  section.dark a { color: var(--coral); }
+  section.dark .body-col code { background: rgba(255, 255, 255, 0.1); color: var(--fg-on-black); }
+  .bullet-dot {
+    display: inline-block;
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: var(--coral);
+    margin-right: 0.6rem;
+  }
   .waitlist-embed {
-    border: 1px dashed var(--border-strong);
+    font-family: var(--sans);
+    border: 1px dashed var(--border-on-black);
     border-radius: 10px;
     padding: 1.25rem;
-    color: var(--muted);
+    color: var(--muted-on-black);
     font-size: 0.9rem;
+    margin-top: 0.5rem;
   }
 
-  .privacy {
-    margin: 3rem 0;
-    padding: 1.4rem 1.5rem;
+  /* ---------- Privacy ---------- */
+  .privacy { padding: 3.5rem 0; }
+  .privacy-card {
+    padding: 1.5rem 1.75rem;
     border: 1px solid var(--border);
-    border-radius: 14px;
-    background: var(--bg-card);
-    border-left: 3px solid var(--gold-2);
+    border-left: 3px solid var(--coral);
+    border-radius: 4px;
+    background: var(--bg-blush);
   }
-  .privacy p { margin: 0; color: #c7cddb; }
+  .privacy-card p { margin: 0; }
 
   footer {
-    padding: 3rem 0 4.5rem;
+    padding: 2.5rem 0 4rem;
     text-align: center;
     color: var(--muted);
-    font-size: 0.9rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border);
   }
-  footer .torch { font-size: 1.2rem; opacity: 0.7; }
-  a { color: var(--gold-1); text-decoration: none; }
-  a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
-  <div class="glow glow-gold"></div>
-  <div class="glow glow-blue"></div>
+  <nav class="topbar">
+    <div class="wrap">
+      <span class="wordmark">🔦 harness-scan</span>
+      <a class="gh" href="https://github.com/VittorioC13/harnessc">GitHub ↗</a>
+    </div>
+  </nav>
 
   <div class="wrap">
     <header class="hero">
-      <div class="pill-row">
-        <span class="pill">🔓 Open source</span>
-        <span class="pill">🚫 No telemetry</span>
-        <span class="pill">$0.002 / scan</span>
-      </div>
+      <p class="eyebrow">LOCAL-FIRST · OPEN SOURCE · $0.002 / SCAN</p>
       <h1>harness-scan</h1>
       <p class="tagline">Lighthouse for your coding agent.</p>
       <p class="oneliner">
@@ -332,33 +321,46 @@
         keeps repeating, and prints a ranked, evidence-backed report — so you can fix your
         harness instead of correcting the agent by hand forever.
       </p>
-      <div class="cmdbox">
-        <code id="cmd">npx harness-scan scan</code>
-        <button id="copy-btn" type="button">Copy</button>
+      <div class="cta-row">
+        <div class="cmdbox">
+          <code id="cmd">npx harness-scan scan</code>
+          <button id="copy-btn" type="button">Copy</button>
+        </div>
+        <a class="btn-outline" href="https://github.com/VittorioC13/harnessc">View source</a>
       </div>
+      <p class="credibility">Built in 6 days — 100% written by Claude Code</p>
     </header>
 
     <!-- TODO (task 4.3): replace with the real demo video once recorded.
          <video controls src="demo.mp4" poster="demo-poster.png"></video>
          or an embedded YouTube-unlisted / Loom iframe. -->
     <div class="video-placeholder reveal">90-second demo video — coming soon</div>
+  </div>
 
-    <section class="pitch reveal">
-      <span class="ghost-num">01</span>
-      <h2>Your agent repeats its mistakes</h2>
-      <p>
-        Every serious team running coding agents corrects the same mistakes over and over —
-        but nobody can <em>see</em> the pattern. It's buried in session transcripts on disk.
-      </p>
-    </section>
+  <section class="split reveal" id="mistakes">
+    <div class="wrap split-grid">
+      <h2>Your agent repeats its mistakes.</h2>
+      <div class="body-col">
+        <p>
+          Every serious team running coding agents corrects the same mistakes over and over
+          — but nobody can <em>see</em> the pattern. It's buried in session transcripts on
+          disk, one scrollback at a time.
+        </p>
+      </div>
+    </div>
+  </section>
 
-    <section class="pitch reveal">
-      <span class="ghost-num">02</span>
-      <h2>See them ranked with evidence</h2>
-      <p>
-        This is a real, unedited run of <code>harness-scan</code> against its own build
-        history — not a mockup, not staged copy:
-      </p>
+  <section class="split blush reveal">
+    <div class="wrap split-grid">
+      <h2>See them ranked, with evidence.</h2>
+      <div class="body-col">
+        <p>
+          This is a real, unedited run of <code>harness-scan</code> against its own build
+          history — not a mockup, not staged copy.
+        </p>
+      </div>
+    </div>
+    <div class="wrap">
       <div class="terminal-window">
         <div class="terminal-titlebar">
           <span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span>
@@ -386,36 +388,46 @@ Full details: harness-report.md</pre>
       </div>
       <p class="demo-caption">Captured verbatim from a real run — see it for yourself: <code>npx harness-scan scan</code></p>
       <button id="replay-btn" type="button" class="replay-btn">▸ Replay</button>
-    </section>
-
-    <section class="pitch reveal">
-      <span class="ghost-num">03</span>
-      <h2>Coming soon: harness-scan fix</h2>
-      <p>
-        Turns clusters into lint rules and docs, as pull requests — not just a report. See a
-        real preview of this on
-        <a href="https://github.com/VittorioC13/harnessc/tree/main/examples/fix-preview">GitHub</a>.
-      </p>
-      <div class="waitlist">
-        <!-- TODO (task 5.2): create the form at tally.so (fields = email only), then
-             replace this placeholder with Tally's embed <iframe> snippet. -->
-        <div class="waitlist-embed">Waitlist form coming soon.</div>
-      </div>
-    </section>
-
-    <div class="privacy reveal" id="privacy">
-      <p>
-        Runs locally. Your code and transcripts never leave your machine except the analysis
-        calls to the DeepSeek API. No telemetry. Open source —
-        <a href="https://github.com/VittorioC13/harnessc">view on GitHub</a>.
-      </p>
     </div>
+  </section>
 
-    <footer id="site-footer">
-      <span class="torch">🔦</span>
-      <a href="https://github.com/VittorioC13/harnessc">github.com/VittorioC13/harnessc</a>
-    </footer>
+  <section class="dark reveal">
+    <div class="wrap split-grid">
+      <h2>Coming soon: harness-scan fix.</h2>
+      <div class="body-col">
+        <p>
+          <span class="bullet-dot"></span>Turns clusters into lint rules and docs, as pull
+          requests — not just a report.
+        </p>
+        <p>
+          <span class="bullet-dot"></span>See a real preview of this on
+          <a href="https://github.com/VittorioC13/harnessc/tree/main/examples/fix-preview">GitHub</a> —
+          an actual working ESLint rule, generated from a real finding.
+        </p>
+        <div class="waitlist">
+          <!-- TODO (task 5.2): create the form at tally.so (fields = email only), then
+               replace this placeholder with Tally's embed <iframe> snippet. -->
+          <div class="waitlist-embed">Waitlist form coming soon.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="privacy reveal" id="privacy">
+      <div class="privacy-card">
+        <p>
+          Runs locally. Your code and transcripts never leave your machine except the analysis
+          calls to the DeepSeek API. No telemetry. Open source —
+          <a href="https://github.com/VittorioC13/harnessc">view on GitHub</a>.
+        </p>
+      </div>
+    </div>
   </div>
+
+  <footer id="site-footer">
+    <a href="https://github.com/VittorioC13/harnessc">github.com/VittorioC13/harnessc</a>
+  </footer>
 
   <script>
     document.getElementById("copy-btn").addEventListener("click", function () {
