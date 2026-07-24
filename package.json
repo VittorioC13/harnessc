@@ -1,14 +1,29 @@
 {
-  "name": "harnessc",
+  "name": "harness-scan",
   "version": "0.1.0",
   "description": "Lighthouse for your coding agent — scans local Claude Code session history for recurring failures.",
   "type": "module",
   "bin": {
-    "harnessc": "dist/cli.js"
+    "harness-scan": "dist/cli.js"
   },
   "files": [
     "dist"
   ],
+  "keywords": [
+    "cli",
+    "claude-code",
+    "ai-agent",
+    "developer-tools",
+    "harness-engineering"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VittorioC13/harnessc.git"
+  },
+  "homepage": "https://github.com/VittorioC13/harnessc#readme",
+  "bugs": {
+    "url": "https://github.com/VittorioC13/harnessc/issues"
+  },
   "engines": {
     "node": ">=20"
   },

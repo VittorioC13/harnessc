@@ -1,13 +1,13 @@
-# harnessc
+# harness-scan
 
 **Lighthouse for your coding agent.**
 
-`harnessc` scans your local Claude Code session history, finds the mistakes your coding
-agent keeps repeating, and prints a ranked, evidence-backed report — so you can fix your
-harness (rules, docs, CI) instead of correcting the agent by hand forever.
+`harness-scan` scans your local Claude Code session history, finds the mistakes your
+coding agent keeps repeating, and prints a ranked, evidence-backed report — so you can fix
+your harness (rules, docs, CI) instead of correcting the agent by hand forever.
 
 ```
-npx harnessc scan
+npx harness-scan scan
 ```
 
 ## Install
@@ -15,7 +15,7 @@ npx harnessc scan
 Requires Node.js 20 or newer. No install step needed — `npx` downloads and runs it:
 
 ```
-npx harnessc scan
+npx harness-scan scan
 ```
 
 (Pre-launch note: this package isn't on npm yet. Until it is, run it from source — see
@@ -24,7 +24,7 @@ npx harnessc scan
 ## Usage
 
 ```
-harnessc scan [options]
+harness-scan scan [options]
 ```
 
 | Option | What it does |
@@ -74,8 +74,8 @@ every run.
 
 ## Roadmap
 
-**Coming soon: `harnessc fix`** — turns each cluster into an actual pull request: a real
-ESLint rule, an AGENTS.md patch, a CI check. Join the waitlist (link coming soon).
+**Coming soon: `harness-scan fix`** — turns each cluster into an actual pull request: a
+real ESLint rule, an AGENTS.md patch, a CI check. Join the waitlist (link coming soon).
 
 ## Development
 

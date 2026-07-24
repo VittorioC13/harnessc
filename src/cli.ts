@@ -15,7 +15,7 @@ export function buildProgram(): Command {
   const program = new Command();
 
   program
-    .name("harnessc")
+    .name("harness-scan")
     .description("Lighthouse for your coding agent — finds your agent's recurring failures.")
     .version(VERSION);
 
@@ -42,10 +42,10 @@ export function buildProgram(): Command {
           const filterNote = opts.project ? ` matching --project "${opts.project}"` : "";
           console.log(
             `No Claude Code sessions found${filterNote}.\n` +
-              `harnessc looks for session transcripts (*.jsonl files) under:\n` +
+              `harness-scan looks for session transcripts (*.jsonl files) under:\n` +
               `  ${DEFAULT_CLAUDE_PROJECTS_DIR}\n` +
               `Claude Code creates one there automatically each time you use it in a project.` +
-              (opts.project ? " Try without --project, or double-check the substring." : " Use it in a project, then run harnessc scan again."),
+              (opts.project ? " Try without --project, or double-check the substring." : " Use it in a project, then run harness-scan scan again."),
           );
         }
         return;

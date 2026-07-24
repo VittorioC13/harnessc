@@ -44,7 +44,7 @@ function wrapText(text: string, indent: string, width = WRAP_WIDTH): string {
 }
 
 function headerLine(data: ReportData): string {
-  return `harnessc report — ${plural(data.sessionsScanned, "session")} scanned (${formatDateRange(data.sessionDates)}), ${plural(data.totalFailureEvents, "failure event")}`;
+  return `harness-scan report — ${plural(data.sessionsScanned, "session")} scanned (${formatDateRange(data.sessionDates)}), ${plural(data.totalFailureEvents, "failure event")}`;
 }
 
 export function renderTerminalReport(data: ReportData): string {
@@ -69,9 +69,9 @@ export function renderTerminalReport(data: ReportData): string {
 
 export function renderMarkdownReport(data: ReportData): string {
   const lines = [
-    "# harnessc report",
+    "# harness-scan report",
     "",
-    `**${headerLine(data).replace("harnessc report — ", "")}**`,
+    `**${headerLine(data).replace("harness-scan report — ", "")}**`,
     "",
     `Estimated cost: $${data.costUsd.toFixed(4)}`,
     "",

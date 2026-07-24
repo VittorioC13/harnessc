@@ -1,4 +1,4 @@
-# PRD — harnessc v1
+# PRD — harness-scan v1
 
 **Read this whole file before writing any code. This document wins every argument.
 If a request conflicts with this PRD, ask the operator before proceeding.**
@@ -7,7 +7,7 @@ If a request conflicts with this PRD, ask the operator before proceeding.**
 
 ## 1. One-liner
 
-**harnessc** scans your local Claude Code session history, finds the mistakes your coding
+**harness-scan** scans your local Claude Code session history, finds the mistakes your coding
 agent keeps repeating, and prints a ranked, evidence-backed report — so you can fix your
 harness (rules, docs, CI) instead of correcting the agent by hand forever.
 
@@ -36,7 +36,7 @@ tool in the first 2 minutes: install friction, report quality, and privacy postu
 ONE command that works beautifully:
 
 ```bash
-npx harnessc scan
+npx harness-scan scan
 ```
 
 - Finds Claude Code session transcripts on the local machine
@@ -61,7 +61,7 @@ refuse and point at this section.
 
 - **Language:** TypeScript, strict mode, Node.js >= 20
 - **CLI framework:** commander
-- **Build:** tsup (single-file build), executable via `npx harnessc`
+- **Build:** tsup (single-file build), executable via `npx harness-scan`
 - **Tests:** vitest
 - **Lint/format:** eslint + prettier
 - **API:** `openai` SDK configured with `baseURL: https://api.deepseek.com` (DeepSeek's
@@ -115,7 +115,7 @@ and an approximate API cost for the scan.
 ## 8. Report format (exact target)
 
 ```
-harnessc report — 47 sessions scanned (May 12 – Jul 20), 132 failure events
+harness-scan report — 47 sessions scanned (May 12 – Jul 20), 132 failure events
 
  #1  Uses deprecated fetchUser() instead of getUser()          12× · 8 sessions
      "no — fetchUser was removed, use getUser like everywhere else"
@@ -137,7 +137,7 @@ Full details: harness-report.md
 - **Specificity test:** every top-5 cluster names a concrete behavior (a function, a file
   pattern, a command, a convention). "Agent made coding errors" = automatic fail.
 - **Evidence test:** every cluster shows at least one real quoted excerpt.
-- **Cold-start test:** a stranger with Claude Code history runs `npx harnessc scan` with
+- **Cold-start test:** a stranger with Claude Code history runs `npx harness-scan scan` with
   only DEEPSEEK_API_KEY set and gets a useful report in under 2 minutes with zero config.
 - **Empty-state test:** with no transcripts found, the tool prints a friendly explanation
   of what it looked for and where — never a stack trace.
@@ -154,10 +154,10 @@ Full details: harness-report.md
 
 ## 11. Website (single page, static)
 
-- Hero: name, one-liner, the `npx harnessc scan` command in a copy-on-click box
+- Hero: name, one-liner, the `npx harness-scan scan` command in a copy-on-click box
 - Embedded 90-second demo video
 - 3 short sections: "Your agent repeats its mistakes" → "See them ranked with evidence" →
-  "Coming soon: harnessc fix — turns clusters into lint rules and docs, as PRs" (this last
+  "Coming soon: harness-scan fix — turns clusters into lint rules and docs, as PRs" (this last
   section contains the Tally waitlist embed)
 - Privacy line: "Runs locally. Your code and transcripts never leave your machine except
   the analysis calls to the DeepSeek API. No telemetry. Open source." + GitHub link
@@ -165,7 +165,7 @@ Full details: harness-report.md
 
 ## 12. Success criteria for launch day
 
-- `npx harnessc scan` works on a machine that has never seen the project
+- `npx harness-scan scan` works on a machine that has never seen the project
 - README: install, usage, how-it-works, privacy, roadmap (autofix waitlist link)
 - Website live on the purchased domain; waitlist form submits
 - Demo video embedded and public
@@ -173,6 +173,7 @@ Full details: harness-report.md
 
 ## 13. Naming
 
-Working name **harnessc**. If taken on npm, fallbacks in order: `harness-scan`,
-`harnessct`, `agentscan-cli`. Whatever is chosen: update this PRD, the README, and the
-site. The name is not precious.
+~~Working name **harnessc**.~~ Taken on npm by an unrelated project (checked 2026-07-24).
+Resolved to the first available fallback: **harness-scan**. PRD, README, and code all
+updated. The GitHub repo itself stays `harnessc` (renaming it wasn't required and risked
+broken links for no benefit). The name is not precious.

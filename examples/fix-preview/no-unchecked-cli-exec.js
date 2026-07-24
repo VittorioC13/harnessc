@@ -1,4 +1,4 @@
-// v2 preview: what `harnessc fix` would generate for cluster #1 in harness-report.md
+// v2 preview: what `harness-scan fix` would generate for cluster #1 in harness-report.md
 // ("Runs 'gh' command without installing it" — 2x across 2 real sessions).
 const EXEC_FUNCTIONS = new Set(["execSync", "spawnSync", "exec", "spawn"]);
 const RISKY_TOOLS = ["gh", "codex", "vercel"];

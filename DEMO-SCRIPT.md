@@ -23,7 +23,7 @@ Talking head or voiceover over a blank terminal.
 Terminal, large font. Run for real, don't fake it:
 
 ```
-npx harnessc scan
+npx harness-scan scan
 ```
 
 Let the spinner lines ("Locating and parsing...", "Summarizing sessions...",
@@ -42,7 +42,7 @@ Scroll the printed report top to bottom, then stop and zoom on cluster #1.
 > loud]. Real evidence, quoted. A concrete suggested fix — not 'the agent made some
 > errors.'"
 
-(Swap in whatever your actual #1 cluster is at recording time — re-run `harnessc scan
+(Swap in whatever your actual #1 cluster is at recording time — re-run `harness-scan scan
 --all` first and use the real current top result, not a stale one.)
 
 ## Shot 4 — The fix-preview firing (1:00–1:20, ~20s)
@@ -61,14 +61,14 @@ npm run demo:fix-preview
 
 Cut to the website (once 5.2 is live) or just say it on camera:
 
-> "Full auto-fix — PRs, not just reports — is `harnessc fix`, coming soon. Link's below if
+> "Full auto-fix — PRs, not just reports — is `harness-scan fix`, coming soon. Link's below if
 > you want in early."
 
 ---
 
 ## Before you hit record
 
-- Re-run `harnessc scan --all` fresh so shot 3 uses your real, current #1 cluster (it
+- Re-run `harness-scan scan --all` fresh so shot 3 uses your real, current #1 cluster (it
   changes as this repo's own history grows).
 - Confirm `npm run demo:fix-preview` still fires (task 4.2's demo).
 - Font size: large enough that cluster names and evidence excerpts are readable at normal

@@ -23,7 +23,7 @@ const data: ReportData = {
 describe("renderTerminalReport", () => {
   it("matches PRD §8's header shape: sessions scanned, date range, failure events", () => {
     const output = renderTerminalReport(data);
-    expect(output).toContain("harnessc report — 47 sessions scanned (May 12 – Jul 20), 132 failure events");
+    expect(output).toContain("harness-scan report — 47 sessions scanned (May 12 – Jul 20), 132 failure events");
   });
 
   it("prints the cluster name, count, and sessions affected", () => {
@@ -63,7 +63,7 @@ describe("renderTerminalReport", () => {
 describe("renderMarkdownReport", () => {
   it("contains the same substantive content as the terminal report", () => {
     const markdown = renderMarkdownReport(data);
-    expect(markdown).toContain("# harnessc report");
+    expect(markdown).toContain("# harness-scan report");
     expect(markdown).toContain("Uses deprecated fetchUser() instead of getUser()");
     expect(markdown).toContain("12× · 8 sessions");
     expect(markdown).toContain("no — fetchUser was removed, use getUser like everywhere else");
