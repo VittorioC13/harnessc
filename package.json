@@ -17,7 +17,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "demo:fix-preview": "eslint --config examples/fix-preview/eslint.config.js examples/fix-preview/bad-example.js"
   },
   "dependencies": {
     "commander": "^12.1.0",

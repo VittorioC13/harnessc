@@ -120,11 +120,12 @@ Status: done — dependency-free `Spinner` (src/lib/spinner.ts, falls back to st
 **VERIFY:** read the README top to bottom yourself. Could a stranger install and run it
 from the README alone? Does the privacy section answer "is this safe?" plainly?
 
-### [ ] 4.2 The polished fix example — DRIVER: Claude Code
+### [x] 4.2 The polished fix example — DRIVER: Claude Code
 Take your #1 real cluster from Day 3. Have the agent hand-generate the v2 preview: an
 actual ESLint rule (with an error message containing remediation instructions) + a 2-line
 AGENTS.md patch for that cluster, saved in `examples/fix-preview/`. This appears in the
 demo video and on the site as "coming soon."
+Status: done — based on the real #1 cluster ("Runs 'gh' command without installing it", 2x/2 sessions). `no-unchecked-cli-exec.js` is a real AST-based ESLint rule (flags execSync/spawnSync/exec/spawn calls to gh/codex/vercel without a preflight check), `agents-md.patch` is the matching 2-line unified diff, `bad-example.js` deliberately trips it. `npm run demo:fix-preview` fires it with a specific remediation message. First cut had `files: ["bad-example.js"]` silently never match (0 problems ≠ success) — caught by actually running the command, not trusting a clean exit; see FAILURES.md.
 **VERIFY:** the example folder exists; the agent demonstrates the lint rule firing on a
 deliberately-bad sample file (`npm run demo:fix-preview` or similar — agent's choice,
 but it must be one command you can run on camera).

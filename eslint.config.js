@@ -47,6 +47,8 @@ export default [
   },
   prettierConfig,
   {
-    ignores: ["dist/**", "node_modules/**"],
+    // examples/fix-preview/bad-example.js is deliberately bad and linted by its own
+    // scoped config via `npm run demo:fix-preview`, not the project's main lint pass.
+    ignores: ["dist/**", "node_modules/**", "examples/**"],
   },
 ];

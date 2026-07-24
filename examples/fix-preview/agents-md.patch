@@ -1,0 +1,8 @@
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -24,6 +24,8 @@
+ - The ONLY permitted network destination in this codebase is api.deepseek.com.
+   No telemetry, no update checks, no analytics. This is a launch-critical promise.
++- Before invoking an external CLI tool (gh, codex, vercel, etc.), verify it's installed
++  first (e.g. `command -v gh`) — don't assume it's present and fail with a raw error.
+ - Never crash on bad input: skip, count, warn once at the end (PRD §10).
