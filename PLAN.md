@@ -79,9 +79,10 @@ printed — it should be well under $1 for 20 sessions.
 
 ## Day 3 — Quality (the make-or-break day)
 
-### [ ] 3.1 Report rendering — DRIVER: Claude Code
+### [x] 3.1 Report rendering — DRIVER: Claude Code
 Implement PRD §7 Step E and §8's exact format: ranked terminal report + harness-report.md.
 Header stats, evidence excerpts, suggested harness fix per cluster.
+Status: done — `src/lib/report.ts` renders both the terminal report (header with session count/date range/event count/cost, ranked clusters with count/sessions/quoted evidence/wrapped suggested fix) and `harness-report.md` (same content, fuller — all evidence excerpts, severity). `scan` now writes the file. 8 new tests. Real run matches PRD §8's shape closely.
 **VERIFY:** `node dist/cli.js scan --limit 30 && cat harness-report.md`
 → terminal output visually matches PRD §8; the markdown file contains the same content.
 

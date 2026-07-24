@@ -1,9 +1,11 @@
+import { writeFile } from "node:fs/promises";
 import { Command } from "commander";
 import { discoverSessions } from "./lib/transcripts.js";
 import { extractSignals } from "./lib/signals.js";
 import { renderTable } from "./lib/format.js";
 import { summarizeSession } from "./lib/summarize.js";
 import { clusterFailureEvents, type EventWithSession } from "./lib/cluster.js";
+import { renderTerminalReport, renderMarkdownReport } from "./lib/report.js";
 import { MissingApiKeyError } from "./lib/llm.js";
 
 const VERSION = "0.1.0";
@@ -78,20 +80,20 @@ export function buildProgram(): Command {
 
       if (clusterResult.skipped) {
         console.warn(`\nClustering skipped: ${clusterResult.warning}`);
-      } else if (clusterResult.clusters.length === 0) {
-        console.log("\nNo recurring failure clusters found.");
-      } else {
-        console.log(`\n${clusterResult.clusters.length} cluster(s) found:\n`);
-        clusterResult.clusters.forEach((cluster, i) => {
-          console.log(
-            `#${i + 1}  ${cluster.name}  (${cluster.count}x across ${cluster.sessionsAffected} session(s), severity ${cluster.topSeverity})`,
-          );
-        });
       }
 
-      console.log(`\nEstimated total cost: $${totalCostUsd.toFixed(4)}`);
+      const reportData = {
+        sessionsScanned: signals.sessionsScanned,
+        sessionDates: signals.sessions.map((s) => s.date),
+        totalFailureEvents: allEvents.length,
+        clusters: clusterResult.clusters,
+        costUsd: totalCostUsd,
+      };
+      console.log(`\n${renderTerminalReport(reportData)}`);
+      await writeFile("harness-report.md", renderMarkdownReport(reportData), "utf-8");
+
       if (skippedSessions > 0) {
-        console.warn(`Warning: skipped ${skippedSessions} session(s) during summarization.`);
+        console.warn(`\nWarning: skipped ${skippedSessions} session(s) during summarization.`);
       }
     });
 

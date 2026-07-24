@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { discoverSessions, type DiscoverOptions } from "./transcripts.js";
+import { discoverSessions, type DiscoverOptions, type SessionSummary } from "./transcripts.js";
 
 export type SignalType = "tool_error" | "user_correction" | "retry_churn";
 
@@ -15,6 +15,7 @@ export interface SignalsResult {
   candidatesBySession: Map<string, FailureCandidate[]>;
   totalCandidates: number;
   sessionsScanned: number;
+  sessions: SessionSummary[];
 }
 
 const MAX_EXCERPT_LENGTH = 500;
@@ -185,5 +186,10 @@ export async function extractSignals(opts: DiscoverOptions = {}): Promise<Signal
     }
   }
 
-  return { candidatesBySession, totalCandidates, sessionsScanned: discovered.sessions.length };
+  return {
+    candidatesBySession,
+    totalCandidates,
+    sessionsScanned: discovered.sessions.length,
+    sessions: discovered.sessions,
+  };
 }
