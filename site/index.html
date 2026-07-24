@@ -318,13 +318,43 @@
 
   <section class="split reveal" id="mistakes">
     <div class="wrap split-grid">
-      <h2>Your agent repeats its mistakes.</h2>
+      <h2>Your agent isn't broken. Your harness is.</h2>
       <div class="body-col">
         <p>
-          Every serious team running coding agents corrects the same mistakes over and over
-          — but nobody can <em>see</em> the pattern. It's buried in session transcripts on
-          disk, one scrollback at a time.
+          When a coding agent makes the same mistake twice, the fix isn't a better prompt —
+          it's changing the environment so that class of mistake becomes impossible: a lint
+          rule, a docs pointer, a CI check. That's <em>harness engineering</em>. Almost nobody
+          does it, because almost nobody can see the pattern. It's buried across dozens of
+          session transcripts on disk, one scrollback at a time.
         </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="split blush reveal" id="differentiation">
+    <div class="wrap split-grid">
+      <h2>Checklists guess. harness-scan knows.</h2>
+      <div class="body-col">
+        <p>
+          Most "agent readiness" tools grade your repo against a static checklist — do you
+          have an <code>AGENTS.md</code>, a CI config, a linter. That tells you what
+          <em>should</em> exist. It says nothing about what actually went wrong.
+          harness-scan learns from your agent's real, observed failures instead of guessing
+          from file structure.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="split reveal" id="how-it-works">
+    <div class="wrap split-grid">
+      <h2>One command, five real steps.</h2>
+      <div class="body-col">
+        <p><strong>1. Locate</strong> — finds every Claude Code session transcript on your machine.</p>
+        <p><strong>2. Extract</strong> — locally, no API calls. Flags tool errors, corrections, and retry loops.</p>
+        <p><strong>3. Summarize</strong> — one DeepSeek call per session turns candidates into specific, one-sentence failures.</p>
+        <p><strong>4. Cluster</strong> — one more call groups failures across every session into ranked, named patterns.</p>
+        <p><strong>5. Report</strong> — ranked, evidence-backed, with a concrete suggested fix for each. No black box: read exactly what each step does in the source.</p>
       </div>
     </div>
   </section>
@@ -334,7 +364,7 @@
       <h2>See them ranked, with evidence.</h2>
       <div class="body-col">
         <p>
-          This is a real, unedited run of <code>harness-scan</code> against its own build
+          Here's a real, unedited run of <code>harness-scan</code> against its own build
           history — not a mockup, not staged copy.
         </p>
       </div>
@@ -374,6 +404,9 @@ Full details: harness-report.md</pre>
     <div class="wrap split-grid">
       <h2>Coming soon: harness-scan fix.</h2>
       <div class="body-col">
+        <p>
+          v1 shows you the pattern. v2 closes the loop: it writes the actual fix.
+        </p>
         <p>
           <span class="bullet-dot"></span>Turns clusters into lint rules and docs, as pull
           requests — not just a report.
