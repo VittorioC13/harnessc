@@ -144,13 +144,29 @@ and it's uploaded (YouTube unlisted or Loom link works).
 
 ## Day 5 — Publish + website
 
-### [ ] 5.1 Publish to npm — DRIVER: Claude Code (IN PROGRESS — package ready, blocked on your npm login + go-ahead to publish)
+### [x] 5.1 Publish to npm — DRIVER: Claude Code
 Check name availability (`npm view harnessc` — error "404" means it's free). If taken,
 use PRD §13 fallbacks and update PRD/README/site copy. Agent prepares package.json
 (bin field, files whitelist, repo links), walks you through `npm login`, then `npm publish`.
-Status: `harnessc` was taken (unrelated project) — resolved to `harness-scan`, PRD §13's first available fallback, with your explicit sign-off. Renamed package/bin/CLI program name/report header throughout the code and docs (see DECISIONS.md). package.json now has bin, files whitelist, repository/homepage/bugs links, keywords. No license field set — that's a real choice I haven't made for you; add one if you want the "open source" README claim backed by an actual license. Not doing `npm login`/`npm publish` myself: that's your account, and publishing is a real, public, hard-to-reverse action. Tell me when you've run `npm login` and want me to run `npm publish`, or you can run it yourself — either way I'll verify with the fresh-folder `npx` command afterward.
-**VERIFY:** on your machine, in a fresh empty folder: `cd $(mktemp -d) && npx <final-name> scan --limit 5`
+Status: `harnessc` was taken (unrelated project) — resolved to `harness-scan`, PRD §13's first available fallback, with your explicit sign-off. package.json has bin, files whitelist, repository/homepage/bugs links, keywords. No license field set — a real, already-disclosed choice (README's own License section says so); not revisited here.
+**Published 2026-07-26.** You ran `npm login` (browser OAuth) yourself; typecheck/lint/50
+tests/build all green; `npm publish --dry-run` reviewed (3 files, 11.2kB) before the real
+publish. First `npm publish` attempt failed with `E403` (npm now requires 2FA for
+publishes) then `EOTP` (this environment can't do npm's interactive OTP prompt). You
+provided one of your npm 2FA recovery codes as `--otp=<code>`, which npm accepted in
+place of a live authenticator code — publish succeeded (`+ harness-scan@0.1.0`).
+Confirmed live on the real registry (`npm view harness-scan version` → `0.1.0`, ~15s
+propagation delay before it resolved). Recovery code is now spent/discarded, not stored
+anywhere in this repo.
+**VERIFY:** on your machine, in a fresh empty folder: `cd $(mktemp -d) && npx harness-scan scan --limit 5`
 → downloads from npm and produces a report.
+**Partially verified:** confirmed `npx harness-scan` genuinely downloads the just-published
+package from npm and runs (fresh temp dir, real network install, clean exit). Did NOT
+confirm a real report is produced — this shell has no `DEEPSEEK_API_KEY` set, so the scan
+ran with 0 sessions/no key and produced no visible output rather than an error (worth its
+own look: silent success on a missing required key is a real UX gap, not verified as
+intentional). Re-run with `DEEPSEEK_API_KEY` set and real Claude Code session history
+present to fully close this VERIFY line.
 
 ### [ ] 5.2 Website — DRIVER: Codex (IN PROGRESS — page built, deploy/Tally/video pending)
 Build PRD §11 as a single `site/index.html` (no framework): hero + copy-box + embedded
