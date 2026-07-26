@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>runwright — describe a task, get a working automation</title>
-<meta name="description" content="runwright is a chat-driven agent that writes and runs real code in an isolated sandbox, connects to your tools, and turns anything that worked into a reusable, re-runnable App. harness-scan is built in." />
-<meta property="og:title" content="runwright — describe a task, get a working automation" />
-<meta property="og:description" content="Chat with an agent. It writes and runs real code in a sandbox — never your machine — then save the result as a reusable App. harness-scan is a built-in flagship." />
+<title>runwright — prompt, context, harness</title>
+<meta name="description" content="You bring the prompt. runwright pulls in the context — your files, secrets, connected tools — and runs it inside a real harness: an isolated sandbox with guardrails. harness-scan is built in." />
+<meta property="og:title" content="runwright — prompt, context, harness" />
+<meta property="og:description" content="The loop that turns a sentence into software that actually runs. An agent writes and runs real code in a sandbox — never your machine — then you save it as a reusable App." />
 <meta property="og:type" content="website" />
 <meta name="theme-color" content="#faf7f2" />
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%E2%9C%88%EF%B8%8F</text></svg>" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23d9704f%22/><text x=%2250%22 y=%2272%22 font-size=%2264%22 font-family=%22Georgia,serif%22 fill=%22white%22 text-anchor=%22middle%22>r</text></svg>" />
 <style>
   :root {
     --bg: #faf7f2;
@@ -329,7 +329,7 @@
 <body>
   <nav class="topbar">
     <div class="wrap">
-      <a class="wordmark" href="#top">✈️ runwright</a>
+      <a class="wordmark" href="#top">runwright</a>
       <div class="nav-links">
         <a class="navlink" href="#loop">How it works</a>
         <a class="navlink" href="#features">Features</a>
@@ -342,12 +342,13 @@
   <div class="wrap" id="top">
     <header class="hero">
       <p class="eyebrow">AGENT-FIRST AUTOMATION · SANDBOXED · CONNECTED</p>
-      <h1>Describe a task. Get a working automation.</h1>
-      <p class="tagline">Not a chatbot answer — a real script that ran.</p>
+      <h1>Prompt. Context. Harness.</h1>
+      <p class="tagline">The loop that turns a sentence into software that actually runs.</p>
       <p class="oneliner">
-        runwright is a chat-driven agent that writes and runs real code in an isolated
-        sandbox, connects to your tools through secure proxies, and turns anything that
-        worked into a reusable, re-runnable App. The chat window <em>is</em> the product.
+        You bring the <strong>prompt</strong>. runwright pulls in the <strong>context</strong> —
+        your files, secrets, and connected tools — and runs it inside a real
+        <strong>harness</strong>: an isolated sandbox with guardrails, so every task ends in a
+        result you can trust, save, and re-run.
       </p>
       <div class="cta-row">
         <a class="btn-primary" href="https://runwright-victors-projects-11f314ba.vercel.app/login">Get started free</a>
@@ -406,32 +407,26 @@
       <p class="sub">Not a script generator — the pieces you need to trust an agent with real work.</p>
       <div class="features">
         <div class="feature">
-          <span class="icon">💬</span>
           <h3>Chat with a real coding agent</h3>
           <p>Powered by Claude. Describe what you want; it writes a complete, runnable script and tells you what it's about to do before it runs.</p>
         </div>
         <div class="feature">
-          <span class="icon">🔒</span>
           <h3>Sandboxed execution</h3>
           <p>Every script runs in a fresh, isolated cloud sandbox. Agent code never touches your computer — a hard boundary, not a setting.</p>
         </div>
         <div class="feature">
-          <span class="icon">🔑</span>
           <h3>Encrypted secrets vault</h3>
           <p>Store API keys once. The agent sees only their names — the real values are injected into the sandbox at run time, never into the model's context.</p>
         </div>
         <div class="feature">
-          <span class="icon">📊</span>
           <h3>Tool connectors</h3>
           <p>Scripts reach Google Sheets through a signed proxy token — the sandbox never holds a real OAuth token. More connectors on the way.</p>
         </div>
         <div class="feature">
-          <span class="icon">⚡</span>
           <h3>Save as App, re-run anytime</h3>
           <p>Turn any working result into a parameterized App with a real form. Re-runs execute the saved script directly — deterministic, zero LLM cost.</p>
         </div>
         <div class="feature">
-          <span class="icon">📁</span>
           <h3>Every file in one place</h3>
           <p>Everything your agent has ever produced — from chat or a saved App run — browsable and downloadable on one Files page.</p>
         </div>
