@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>harness-scan — Lighthouse for your coding agent</title>
-<meta name="description" content="harness-scan scans your local Claude Code session history, finds the mistakes your coding agent keeps repeating, and prints a ranked, evidence-backed report." />
-<meta property="og:title" content="harness-scan — Lighthouse for your coding agent" />
-<meta property="og:description" content="Your coding agent repeats its mistakes. harness-scan finds them, ranked, with evidence." />
+<title>runwright — describe a task, get a working automation</title>
+<meta name="description" content="runwright is a chat-driven agent that writes and runs real code in an isolated sandbox, connects to your tools, and turns anything that worked into a reusable, re-runnable App. harness-scan is built in." />
+<meta property="og:title" content="runwright — describe a task, get a working automation" />
+<meta property="og:description" content="Chat with an agent. It writes and runs real code in a sandbox — never your machine — then save the result as a reusable App. harness-scan is a built-in flagship." />
 <meta property="og:type" content="website" />
 <meta name="theme-color" content="#faf7f2" />
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔦</text></svg>" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>%E2%9C%88%EF%B8%8F</text></svg>" />
 <style>
   :root {
     --bg: #faf7f2;
@@ -47,7 +47,11 @@
   /* ---------- Nav ---------- */
   nav.topbar {
     border-bottom: 1px solid var(--border);
-    background: var(--bg);
+    background: color-mix(in srgb, var(--bg) 90%, transparent);
+    backdrop-filter: blur(8px);
+    position: sticky;
+    top: 0;
+    z-index: 10;
   }
   nav.topbar .wrap {
     display: flex;
@@ -63,16 +67,21 @@
     letter-spacing: -0.02em;
     color: var(--fg);
   }
-  nav.topbar a.gh {
+  .wordmark:hover { text-decoration: none; }
+  nav.topbar .nav-links { display: flex; align-items: center; gap: 1.4rem; }
+  nav.topbar .nav-links a.navlink { font-family: var(--sans); font-size: 0.9rem; font-weight: 600; color: var(--muted); }
+  nav.topbar .nav-links a.navlink:hover { color: var(--fg); text-decoration: none; }
+  nav.topbar a.cta-pill {
     font-family: var(--sans);
     font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--fg);
-    border: 1px solid var(--border-strong);
+    font-weight: 700;
+    color: var(--bg);
+    background: var(--fg);
+    border: 1px solid var(--fg);
     border-radius: 999px;
-    padding: 0.45rem 1.1rem;
+    padding: 0.45rem 1.15rem;
   }
-  nav.topbar a.gh:hover { background: var(--fg); color: var(--bg); text-decoration: none; }
+  nav.topbar a.cta-pill:hover { opacity: 0.88; text-decoration: none; }
 
   /* ---------- Hero ---------- */
   header.hero { padding: 5rem 0 3rem; text-align: center; }
@@ -86,45 +95,31 @@
   }
   h1 {
     font-family: var(--sans);
-    font-size: clamp(2.5rem, 7vw, 4.2rem);
+    font-size: clamp(2.4rem, 6.2vw, 3.9rem);
     font-weight: 800;
-    margin: 0 0 0.75rem;
+    margin: 0 auto 0.75rem;
     letter-spacing: -0.03em;
-    line-height: 1.05;
+    line-height: 1.06;
     color: var(--fg);
+    max-width: 900px;
   }
   .tagline { font-size: 1.2rem; color: var(--muted); margin: 0 0 1.5rem; font-style: italic; }
-  .oneliner { max-width: 560px; margin: 0 auto 2.25rem; font-size: 1.08rem; }
+  .oneliner { max-width: 600px; margin: 0 auto 2.25rem; font-size: 1.08rem; }
 
   .cta-row { display: flex; justify-content: center; align-items: center; gap: 0.85rem; flex-wrap: wrap; }
 
-  .cmdbox {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: var(--fg);
-    border-radius: 8px;
-    padding: 0.65rem 0.65rem 0.65rem 1.1rem;
-  }
-  .cmdbox code {
-    font-family: var(--mono);
-    font-size: 0.95rem;
-    color: #f3ece1;
-    white-space: nowrap;
-  }
-  .cmdbox code::before { content: "$ "; color: var(--coral); }
-  .cmdbox button {
+  .btn-primary {
     font-family: var(--sans);
-    background: #f3ece1;
-    color: var(--fg);
     font-weight: 700;
-    border: none;
-    border-radius: 6px;
-    padding: 0.5rem 0.9rem;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
+    color: var(--bg);
+    background: var(--coral);
+    border: 1px solid var(--coral);
+    border-radius: 8px;
+    padding: 0.7rem 1.5rem;
     cursor: pointer;
   }
-  .cmdbox button:hover { opacity: 0.85; }
+  .btn-primary:hover { opacity: 0.9; text-decoration: none; }
 
   .btn-outline {
     font-family: var(--sans);
@@ -134,7 +129,7 @@
     background: transparent;
     border: 1px solid var(--border-strong);
     border-radius: 8px;
-    padding: 0.65rem 1.2rem;
+    padding: 0.7rem 1.3rem;
   }
   .btn-outline:hover { background: var(--bg-blush); text-decoration: none; }
 
@@ -148,234 +143,332 @@
     margin: 3rem 0 0;
   }
 
+  /* ---------- Hero chat demo ---------- */
+  .chat-demo {
+    max-width: 720px;
+    margin: 3rem auto 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 24px 50px -28px rgba(20, 16, 8, 0.35);
+    text-align: left;
+  }
+  .chat-demo .chrome {
+    display: flex; align-items: center; gap: 0.4rem;
+    padding: 0.65rem 0.9rem;
+    background: #e9e2d8;
+    border-bottom: 1px solid var(--border);
+  }
+  .chrome .dot { width: 0.65rem; height: 0.65rem; border-radius: 50%; display: inline-block; }
+  .dot-red { background: #ff5f57; } .dot-yellow { background: #febc2e; } .dot-green { background: #28c840; }
+  .chrome .chrome-title { margin-left: 0.5rem; color: var(--muted); font-size: 0.78rem; font-family: var(--mono); }
+  .chat-demo .body { padding: 1.3rem 1.4rem; font-family: var(--mono); font-size: 0.86rem; }
+  .chat-row { margin-bottom: 0.9rem; display: flex; gap: 0.7rem; }
+  .chat-row .who { color: var(--muted); flex-shrink: 0; width: 5.5rem; }
+  .chat-row .msg { color: var(--fg); }
+  .chat-row.agent .msg { color: var(--muted); }
+  .chat-file {
+    margin-top: 0.4rem;
+    background: var(--bg-black);
+    color: #e3e6ea;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.8rem;
+    overflow-x: auto;
+  }
+  .chat-file .ok { color: #7ee0a8; }
+
   .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease, transform 0.6s ease; }
   .reveal.is-visible { opacity: 1; transform: none; }
   @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
 
-  /* ---------- Two-column sections ---------- */
-  section.split {
-    padding: 4.5rem 0;
-    border-top: 1px solid var(--border);
-  }
-  section.split.blush { background: var(--bg-blush); }
-  .split-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-    align-items: start;
-  }
-  @media (max-width: 720px) {
-    .split-grid { grid-template-columns: 1fr; gap: 1.25rem; }
-  }
-  section.split h2 {
+  /* ---------- Loop ---------- */
+  section.loop-section { padding: 4.5rem 0; border-top: 1px solid var(--border); }
+  section.loop-section h2 {
     font-family: var(--sans);
     font-size: clamp(1.75rem, 4vw, 2.4rem);
     font-weight: 800;
     letter-spacing: -0.02em;
     line-height: 1.15;
-    margin: 0;
+    margin: 0 0 0.5rem;
+    text-align: center;
+  }
+  section.loop-section .sub { text-align: center; color: var(--muted); max-width: 560px; margin: 0 auto 2.75rem; }
+  .loop { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.1rem; }
+  .loop .step {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.4rem 1.25rem;
+  }
+  .loop .step .num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 1.8rem; height: 1.8rem; border-radius: 999px;
+    background: var(--coral); color: #fff;
+    font-family: var(--sans); font-size: 0.85rem; font-weight: 700;
+    margin-bottom: 0.9rem;
+  }
+  .loop .step h3 { font-family: var(--sans); font-size: 1.05rem; font-weight: 700; margin: 0 0 0.35rem; }
+  .loop .step p { font-family: var(--sans); font-size: 0.9rem; color: var(--muted); margin: 0; line-height: 1.5; }
+
+  /* ---------- Features ---------- */
+  section.features-section { padding: 4.5rem 0; border-top: 1px solid var(--border); background: var(--bg-blush); }
+  section.features-section h2 {
+    font-family: var(--sans);
+    font-size: clamp(1.75rem, 4vw, 2.4rem);
+    font-weight: 800; letter-spacing: -0.02em; line-height: 1.15;
+    margin: 0 0 0.5rem; text-align: center;
+  }
+  section.features-section .sub { text-align: center; color: var(--muted); max-width: 560px; margin: 0 auto 2.75rem; }
+  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
+  .feature {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+  .feature .icon { font-size: 1.5rem; margin-bottom: 0.7rem; display: block; }
+  .feature h3 { font-family: var(--sans); font-size: 1.05rem; font-weight: 700; margin: 0 0 0.4rem; }
+  .feature p { font-family: var(--sans); font-size: 0.9rem; color: var(--muted); margin: 0; line-height: 1.5; }
+
+  /* ---------- Section headers (generic split) ---------- */
+  section.split { padding: 4.5rem 0; border-top: 1px solid var(--border); }
+  .split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
+  @media (max-width: 720px) { .split-grid { grid-template-columns: 1fr; gap: 1.25rem; } }
+  section.split h2 {
+    font-family: var(--sans);
+    font-size: clamp(1.75rem, 4vw, 2.4rem);
+    font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; margin: 0;
   }
   section.split .body-col p { margin: 0 0 1rem; color: var(--fg); }
   section.split .body-col code {
-    background: rgba(20, 16, 8, 0.06);
-    border-radius: 4px;
-    padding: 0.1rem 0.4rem;
-    font-family: var(--mono);
-    font-size: 0.88em;
+    background: rgba(20, 16, 8, 0.06); border-radius: 4px; padding: 0.1rem 0.4rem;
+    font-family: var(--mono); font-size: 0.88em;
   }
 
-  /* ---------- Terminal demo card ---------- */
-  .terminal-window {
-    margin-top: 1.5rem;
-    border-radius: 10px;
-    overflow: hidden;
-    background: #16181d;
-    box-shadow: 0 24px 50px -24px rgba(20, 16, 8, 0.35);
+  /* ---------- harness-scan flagship (dark) ---------- */
+  section.flagship { background: var(--bg-black); color: var(--fg-on-black); padding: 5rem 0; border-top: 1px solid var(--border); }
+  section.flagship h2 { color: var(--fg-on-black); font-family: var(--sans); font-size: clamp(1.75rem, 4vw, 2.4rem); font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; margin: 0 0 0.75rem; }
+  section.flagship .body-col p { color: var(--muted-on-black); }
+  section.flagship a { color: var(--coral); }
+  section.flagship .badge {
+    display: inline-block; font-family: var(--sans);
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 0.25rem 0.7rem; border-radius: 999px;
+    background: rgba(255,255,255,0.08); border: 1px solid var(--border-on-black);
+    color: var(--muted-on-black); margin-bottom: 1rem;
   }
-  .terminal-titlebar {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.6rem 0.8rem;
-    background: #e9e2d8;
+  .cmdbox {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: #000; border: 1px solid var(--border-on-black);
+    border-radius: 8px; padding: 0.55rem 0.55rem 0.55rem 1.1rem; margin-top: 0.5rem;
   }
+  .cmdbox code { font-family: var(--mono); font-size: 0.9rem; color: #f3ece1; white-space: nowrap; }
+  .cmdbox code::before { content: "$ "; color: var(--coral); }
+  .cmdbox button {
+    font-family: var(--sans); background: #f3ece1; color: var(--fg); font-weight: 700;
+    border: none; border-radius: 6px; padding: 0.45rem 0.85rem; font-size: 0.82rem; cursor: pointer;
+  }
+  .cmdbox button:hover { opacity: 0.85; }
+
+  .terminal-window { margin-top: 1.5rem; border-radius: 10px; overflow: hidden; background: #0d0f13; box-shadow: 0 24px 50px -24px rgba(0,0,0,0.5); }
+  .terminal-titlebar { display: flex; align-items: center; gap: 0.4rem; padding: 0.6rem 0.8rem; background: #e9e2d8; }
   .terminal-titlebar .dot { width: 0.65rem; height: 0.65rem; border-radius: 50%; display: inline-block; }
-  .dot-red { background: #ff5f57; }
-  .dot-yellow { background: #febc2e; }
-  .dot-green { background: #28c840; }
-  .terminal-titlebar .terminal-title {
-    margin-left: 0.5rem;
-    color: #6b6558;
-    font-size: 0.78rem;
-    font-family: var(--mono);
-  }
+  .terminal-titlebar .terminal-title { margin-left: 0.5rem; color: #6b6558; font-size: 0.78rem; font-family: var(--mono); }
   pre.terminal-body {
-    margin: 0;
-    padding: 1.15rem 1.25rem;
-    color: #e3e6ea;
-    font-family: var(--mono);
-    font-size: 0.78rem;
-    line-height: 1.65;
-    overflow-x: auto;
-    white-space: pre-wrap;
-    min-height: 13rem;
+    margin: 0; padding: 1.15rem 1.25rem; color: #e3e6ea;
+    font-family: var(--mono); font-size: 0.78rem; line-height: 1.65;
+    overflow-x: auto; white-space: pre-wrap; min-height: 12rem;
   }
   .terminal-cursor { display: inline-block; width: 0.5em; background: var(--coral); animation: blink 1s steps(1) infinite; }
   @keyframes blink { 50% { opacity: 0; } }
-  .demo-caption { font-family: var(--sans); color: var(--muted); font-size: 0.85rem; margin: 0.85rem 0 0.75rem; }
+  .demo-caption { font-family: var(--sans); color: var(--muted-on-black); font-size: 0.85rem; margin: 0.85rem 0 0.75rem; }
   .replay-btn {
-    font-family: var(--sans);
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    background: none;
-    border: 1px solid var(--border-strong);
-    color: var(--muted);
-    border-radius: 7px;
-    padding: 0.4rem 0.95rem;
-    font-size: 0.8rem;
-    cursor: pointer;
+    font-family: var(--sans); display: inline-flex; align-items: center; gap: 0.35rem;
+    background: none; border: 1px solid var(--border-on-black); color: var(--muted-on-black);
+    border-radius: 7px; padding: 0.4rem 0.95rem; font-size: 0.8rem; cursor: pointer;
   }
-  .replay-btn:hover { color: var(--fg); border-color: var(--fg); }
-
-  /* ---------- Black contrast section ---------- */
-  section.dark {
-    background: var(--bg-black);
-    color: var(--fg-on-black);
-    padding: 5rem 0;
-  }
-  section.dark h2 { color: var(--fg-on-black); }
-  section.dark .body-col p { color: var(--muted-on-black); }
-  section.dark a { color: var(--coral); }
-  section.dark .body-col code { background: rgba(255, 255, 255, 0.1); color: var(--fg-on-black); }
-  .bullet-dot {
-    display: inline-block;
-    width: 0.4rem;
-    height: 0.4rem;
-    border-radius: 50%;
-    background: var(--coral);
-    margin-right: 0.6rem;
-  }
-  .waitlist-embed {
-    font-family: var(--sans);
-    border: 1px dashed var(--border-on-black);
-    border-radius: 10px;
-    padding: 1.25rem;
-    color: var(--muted-on-black);
-    font-size: 0.9rem;
-    margin-top: 0.5rem;
-  }
+  .replay-btn:hover { color: var(--fg-on-black); border-color: var(--fg-on-black); }
 
   /* ---------- Privacy ---------- */
-  .privacy { padding: 3.5rem 0; }
-  .privacy-card {
-    padding: 1.5rem 1.75rem;
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--coral);
-    border-radius: 4px;
-    background: var(--bg-blush);
+  section.privacy-section { padding: 4.5rem 0; border-top: 1px solid var(--border); }
+  section.privacy-section h2 {
+    font-family: var(--sans); font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+    font-weight: 800; letter-spacing: -0.02em; margin: 0 0 2rem; text-align: center;
   }
-  .privacy-card p { margin: 0; }
+  .privacy-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.4rem; }
+  .privacy-item { border-left: 3px solid var(--coral); padding-left: 1rem; }
+  .privacy-item h3 { font-family: var(--sans); font-size: 1rem; font-weight: 700; margin: 0 0 0.35rem; }
+  .privacy-item p { font-family: var(--sans); font-size: 0.9rem; color: var(--muted); margin: 0; line-height: 1.5; }
+
+  /* ---------- Final CTA ---------- */
+  section.final-cta { padding: 5rem 0; text-align: center; border-top: 1px solid var(--border); background: var(--bg-blush); }
+  section.final-cta h2 { font-family: var(--sans); font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; letter-spacing: -0.02em; margin: 0 0 0.75rem; }
+  section.final-cta p { max-width: 520px; margin: 0 auto 1.75rem; color: var(--muted); }
 
   footer {
-    padding: 2.5rem 0 4rem;
-    text-align: center;
-    color: var(--muted);
-    font-family: var(--sans);
-    font-size: 0.85rem;
-    border-top: 1px solid var(--border);
+    padding: 2.5rem 0 4rem; text-align: center; color: var(--muted);
+    font-family: var(--sans); font-size: 0.85rem; border-top: 1px solid var(--border);
+  }
+  footer .foot-links { display: flex; justify-content: center; gap: 1.4rem; margin-bottom: 0.8rem; }
+  footer .foot-links a { color: var(--muted); }
+  footer .foot-links a:hover { color: var(--fg); }
+
+  @media (max-width: 860px) {
+    .loop { grid-template-columns: repeat(2, 1fr); }
+    .features { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .loop, .features, .privacy-grid { grid-template-columns: 1fr; }
+    nav.topbar .nav-links a.navlink { display: none; }
+    .chat-row .who { width: 4.5rem; }
   }
 </style>
 </head>
 <body>
   <nav class="topbar">
     <div class="wrap">
-      <span class="wordmark">🔦 harness-scan</span>
-      <a class="gh" href="https://github.com/VittorioC13/harnessc">GitHub ↗</a>
+      <a class="wordmark" href="#top">✈️ runwright</a>
+      <div class="nav-links">
+        <a class="navlink" href="#loop">How it works</a>
+        <a class="navlink" href="#features">Features</a>
+        <a class="navlink" href="#harness-scan">harness-scan</a>
+        <a class="cta-pill" href="https://runwright-victors-projects-11f314ba.vercel.app/login">Sign in</a>
+      </div>
     </div>
   </nav>
 
-  <div class="wrap">
+  <div class="wrap" id="top">
     <header class="hero">
-      <p class="eyebrow">LOCAL-FIRST · OPEN SOURCE · $0.002 / SCAN</p>
-      <h1>harness-scan</h1>
-      <p class="tagline">Lighthouse for your coding agent.</p>
+      <p class="eyebrow">AGENT-FIRST AUTOMATION · SANDBOXED · CONNECTED</p>
+      <h1>Describe a task. Get a working automation.</h1>
+      <p class="tagline">Not a chatbot answer — a real script that ran.</p>
       <p class="oneliner">
-        Scans your local Claude Code session history, finds the mistakes your coding agent
-        keeps repeating, and prints a ranked, evidence-backed report — so you can fix your
-        harness instead of correcting the agent by hand forever.
+        runwright is a chat-driven agent that writes and runs real code in an isolated
+        sandbox, connects to your tools through secure proxies, and turns anything that
+        worked into a reusable, re-runnable App. The chat window <em>is</em> the product.
       </p>
       <div class="cta-row">
-        <div class="cmdbox">
-          <code id="cmd">npx harness-scan scan</code>
-          <button id="copy-btn" type="button">Copy</button>
-        </div>
-        <a class="btn-outline" href="https://github.com/VittorioC13/harnessc">View source</a>
+        <a class="btn-primary" href="https://runwright-victors-projects-11f314ba.vercel.app/login">Get started free</a>
+        <a class="btn-outline" href="#loop">See how it works</a>
       </div>
-      <p class="credibility">Built in 6 days — 100% written by Claude Code</p>
+
+      <div class="chat-demo reveal">
+        <div class="chrome">
+          <span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+          <span class="chrome-title">runwright — chat</span>
+        </div>
+        <div class="body">
+          <div class="chat-row user"><span class="who">you</span><span class="msg">Take this CSV, build an interactive HTML dashboard of monthly revenue.</span></div>
+          <div class="chat-row agent"><span class="who">runwright</span><span class="msg">Reading revenue.csv and building the dashboard now.</span></div>
+          <div class="chat-file">$ python3 script.py
+<span class="ok">✓ wrote dashboard.html (12.4kb)</span></div>
+          <div class="chat-row agent"><span class="who"></span><span class="msg">→ dashboard.html — previewed inline, downloadable, and one click from a reusable App.</span></div>
+        </div>
+      </div>
+      <p class="credibility">100% designed &amp; built by Claude Code</p>
     </header>
   </div>
 
-  <section class="split reveal" id="mistakes">
-    <div class="wrap split-grid">
-      <h2>Your agent isn't broken. Your harness is.</h2>
-      <div class="body-col">
-        <p>
-          When a coding agent makes the same mistake twice, the fix isn't a better prompt —
-          it's changing the environment so that class of mistake becomes impossible: a lint
-          rule, a docs pointer, a CI check. That's <em>harness engineering</em>. Almost nobody
-          does it, because almost nobody can see the pattern. It's buried across dozens of
-          session transcripts on disk, one scrollback at a time.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <section class="split blush reveal" id="differentiation">
-    <div class="wrap split-grid">
-      <h2>Checklists guess. harness-scan knows.</h2>
-      <div class="body-col">
-        <p>
-          Most "agent readiness" tools grade your repo against a static checklist — do you
-          have an <code>AGENTS.md</code>, a CI config, a linter. That tells you what
-          <em>should</em> exist. It says nothing about what actually went wrong.
-          harness-scan learns from your agent's real, observed failures instead of guessing
-          from file structure.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <section class="split reveal" id="how-it-works">
-    <div class="wrap split-grid">
-      <h2>One command, five real steps.</h2>
-      <div class="body-col">
-        <p><strong>1. Locate</strong> — finds every Claude Code session transcript on your machine.</p>
-        <p><strong>2. Extract</strong> — locally, no API calls. Flags tool errors, corrections, and retry loops.</p>
-        <p><strong>3. Summarize</strong> — one DeepSeek call per session turns candidates into specific, one-sentence failures.</p>
-        <p><strong>4. Cluster</strong> — one more call groups failures across every session into ranked, named patterns.</p>
-        <p><strong>5. Report</strong> — ranked, evidence-backed, with a concrete suggested fix for each. No black box: read exactly what each step does in the source.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="split blush reveal">
-    <div class="wrap split-grid">
-      <h2>See them ranked, with evidence.</h2>
-      <div class="body-col">
-        <p>
-          Here's a real, unedited run of <code>harness-scan</code> against its own build
-          history — not a mockup, not staged copy.
-        </p>
-      </div>
-    </div>
+  <section class="loop-section reveal" id="loop">
     <div class="wrap">
-      <div class="terminal-window">
-        <div class="terminal-titlebar">
-          <span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span>
-          <span class="terminal-title">zsh</span>
+      <h2>Everything serves one loop</h2>
+      <p class="sub">Describe it, the agent runs it, you see the result, you keep it. No forms to fill out first, no templates to pick.</p>
+      <div class="loop">
+        <div class="step">
+          <span class="num">1</span>
+          <h3>Describe the task</h3>
+          <p>Plain English, in chat. No config, no picking a template first.</p>
         </div>
-        <pre class="terminal-body" id="terminal-output" aria-live="polite">$ npx harness-scan scan
+        <div class="step">
+          <span class="num">2</span>
+          <h3>Agent writes &amp; runs it</h3>
+          <p>A real script executes in an isolated cloud sandbox — never on your machine, never with a raw copy of your credentials.</p>
+        </div>
+        <div class="step">
+          <span class="num">3</span>
+          <h3>See the result</h3>
+          <p>Output, logs, and any file it made — HTML, CSV, PDF, images — previewed right in the chat.</p>
+        </div>
+        <div class="step">
+          <span class="num">4</span>
+          <h3>Save as an App</h3>
+          <p>One click turns a working task into a reusable App with an auto-generated form. Re-run it anytime, no LLM call needed.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features-section reveal" id="features">
+    <div class="wrap">
+      <h2>A real automation platform</h2>
+      <p class="sub">Not a script generator — the pieces you need to trust an agent with real work.</p>
+      <div class="features">
+        <div class="feature">
+          <span class="icon">💬</span>
+          <h3>Chat with a real coding agent</h3>
+          <p>Powered by Claude. Describe what you want; it writes a complete, runnable script and tells you what it's about to do before it runs.</p>
+        </div>
+        <div class="feature">
+          <span class="icon">🔒</span>
+          <h3>Sandboxed execution</h3>
+          <p>Every script runs in a fresh, isolated cloud sandbox. Agent code never touches your computer — a hard boundary, not a setting.</p>
+        </div>
+        <div class="feature">
+          <span class="icon">🔑</span>
+          <h3>Encrypted secrets vault</h3>
+          <p>Store API keys once. The agent sees only their names — the real values are injected into the sandbox at run time, never into the model's context.</p>
+        </div>
+        <div class="feature">
+          <span class="icon">📊</span>
+          <h3>Tool connectors</h3>
+          <p>Scripts reach Google Sheets through a signed proxy token — the sandbox never holds a real OAuth token. More connectors on the way.</p>
+        </div>
+        <div class="feature">
+          <span class="icon">⚡</span>
+          <h3>Save as App, re-run anytime</h3>
+          <p>Turn any working result into a parameterized App with a real form. Re-runs execute the saved script directly — deterministic, zero LLM cost.</p>
+        </div>
+        <div class="feature">
+          <span class="icon">📁</span>
+          <h3>Every file in one place</h3>
+          <p>Everything your agent has ever produced — from chat or a saved App run — browsable and downloadable on one Files page.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="flagship reveal" id="harness-scan">
+    <div class="wrap split-grid">
+      <div>
+        <span class="badge">Flagship built-in App</span>
+        <h2>Find your coding agent's recurring failures</h2>
+        <div class="body-col">
+          <p>
+            <strong>harness-scan</strong> is a free, open-source CLI that scans your local
+            Claude Code session history and prints a ranked report of the mistakes your
+            agent keeps repeating — so you can fix your <em>harness</em> instead of correcting
+            the agent by hand forever.
+          </p>
+          <p>
+            It's also built right into runwright: upload a session transcript export, and
+            runwright installs harness-scan from npm inside its own sandbox and runs the exact
+            same scan. No local install, and never a live connection to your machine.
+          </p>
+          <div class="cmdbox">
+            <code id="cmd">npx harness-scan scan</code>
+            <button id="copy-btn" type="button">Copy</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="terminal-window">
+          <div class="terminal-titlebar">
+            <span class="dot dot-red"></span><span class="dot dot-yellow"></span><span class="dot dot-green"></span>
+            <span class="terminal-title">zsh</span>
+          </div>
+          <pre class="terminal-body" id="terminal-output" aria-live="polite">$ npx harness-scan scan
 Locating and parsing Claude Code sessions...
 2 session(s) scanned, 43 failure-signal candidate(s) found across 2 session(s).
 Summarizing sessions...
@@ -385,78 +478,77 @@ Clustering failure events...
 harness-scan report — 2 sessions scanned (Jul 23 – Jul 24), 9 failure events
 Estimated cost: $0.0021
 
- #1  Verify that required command-line tools (gh, codex) are installed before using them   3× · 2 sessions
+ #1  Verify required CLI tools (gh, codex) are installed before using them   3× · 2 sessions
      "(eval):1: command not found: gh"
-     Suggested harness fix: Add a pre-flight check in the agent's initialization script to verify that
-     necessary CLI tools (like gh, codex) are installed. In AGENTS.md, include a
-     reminder to always run `which &lt;tool&gt;` before attempting to use a
-     command-line tool. Additionally, consider using a tool like `command -v` to
-     check availability and provide a clear error message if missing.
+     Suggested harness fix: add a pre-flight `command -v` check in the agent's
+     init script, and a note in AGENTS.md to run `which &lt;tool&gt;` first.
 
 Full details: harness-report.md</pre>
+        </div>
+        <p class="demo-caption">A real, unedited run — see it for yourself: <code>npx harness-scan scan</code></p>
+        <button id="replay-btn" type="button" class="replay-btn">▸ Replay</button>
       </div>
-      <p class="demo-caption">Captured verbatim from a real run — see it for yourself: <code>npx harness-scan scan</code></p>
-      <button id="replay-btn" type="button" class="replay-btn">▸ Replay</button>
     </div>
   </section>
 
-  <section class="dark reveal">
-    <div class="wrap split-grid">
-      <h2>Coming soon: harness-scan fix.</h2>
-      <div class="body-col">
-        <p>
-          v1 shows you the pattern. v2 closes the loop: it writes the actual fix.
-        </p>
-        <p>
-          <span class="bullet-dot"></span>Turns clusters into lint rules and docs, as pull
-          requests — not just a report.
-        </p>
-        <p>
-          <span class="bullet-dot"></span>See a real preview of this on
-          <a href="https://github.com/VittorioC13/harnessc/tree/main/examples/fix-preview">GitHub</a> —
-          an actual working ESLint rule, generated from a real finding.
-        </p>
-        <div class="waitlist">
-          <!-- TODO (task 5.2): create the form at tally.so (fields = email only), then
-               replace this placeholder with Tally's embed <iframe> snippet. -->
-          <div class="waitlist-embed">Waitlist form coming soon.</div>
+  <section class="privacy-section reveal">
+    <div class="wrap">
+      <h2>Security decided up front — not bolted on</h2>
+      <div class="privacy-grid">
+        <div class="privacy-item">
+          <h3>No raw tokens in the sandbox</h3>
+          <p>Connectors work through a short-lived, signed proxy token. The real OAuth token exists only inside runwright's own server, never in agent-generated code.</p>
+        </div>
+        <div class="privacy-item">
+          <h3>Secrets, name-only to the model</h3>
+          <p>The agent sees a secret's name so it can reference it in code — never the value. Values are decrypted only at run time, injected straight into the sandbox.</p>
+        </div>
+        <div class="privacy-item">
+          <h3>Every run ends honestly</h3>
+          <p>No silent retries, no swallowed errors. Every execution reports a real exit code with the actual output and logs, visible to you.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="wrap">
-    <div class="privacy reveal" id="privacy">
-      <div class="privacy-card">
-        <p>
-          Runs locally. Your code and transcripts never leave your machine except the analysis
-          calls to the DeepSeek API. No telemetry. Open source —
-          <a href="https://github.com/VittorioC13/harnessc">view on GitHub</a>.
-        </p>
+  <section class="final-cta reveal">
+    <div class="wrap">
+      <h2>Describe your first task in under five minutes</h2>
+      <p>No docs to read first. Sign in and start typing — the chat window is the whole product.</p>
+      <div class="cta-row">
+        <a class="btn-primary" href="https://runwright-victors-projects-11f314ba.vercel.app/login">Get started free</a>
       </div>
     </div>
-  </div>
+  </section>
 
-  <footer id="site-footer">
-    <a href="https://github.com/VittorioC13/harnessc">github.com/VittorioC13/harnessc</a>
+  <footer>
+    <div class="foot-links">
+      <a href="https://runwright-victors-projects-11f314ba.vercel.app/login">Sign in</a>
+      <a href="https://www.npmjs.com/package/harness-scan">harness-scan (npm)</a>
+      <a href="https://github.com/VittorioC13/harnessc">GitHub</a>
+    </div>
+    <p>© 2026 runwright.</p>
   </footer>
 
   <script>
-    document.getElementById("copy-btn").addEventListener("click", function () {
-      var text = document.getElementById("cmd").textContent;
-      var btn = this;
-      var original = btn.textContent;
-      navigator.clipboard.writeText(text).then(
-        function () {
-          btn.textContent = "Copied!";
-          setTimeout(function () { btn.textContent = original; }, 1500);
-        },
-        function () {
-          btn.textContent = "Copy failed — select manually";
-          setTimeout(function () { btn.textContent = original; }, 2000);
-        },
-      );
-    });
+    var copyBtn = document.getElementById("copy-btn");
+    if (copyBtn) {
+      copyBtn.addEventListener("click", function () {
+        var text = document.getElementById("cmd").textContent;
+        var btn = this;
+        var original = btn.textContent;
+        navigator.clipboard.writeText(text).then(
+          function () {
+            btn.textContent = "Copied!";
+            setTimeout(function () { btn.textContent = original; }, 1500);
+          },
+          function () {
+            btn.textContent = "Copy failed";
+            setTimeout(function () { btn.textContent = original; }, 2000);
+          },
+        );
+      });
+    }
   </script>
 
   <script>
@@ -476,18 +568,13 @@ Full details: harness-report.md</pre>
         }
         el.textContent = text.slice(0, i);
         if (cursor) el.appendChild(cursor);
-        // A few chars at a time reads naturally without taking forever on ~700 characters.
         window.setTimeout(function () { type(text, i + 2, cursor); }, 8);
       }
 
       function play() {
         if (playing) return;
         playing = true;
-        if (reduceMotion) {
-          el.textContent = fullText;
-          playing = false;
-          return;
-        }
+        if (reduceMotion) { el.textContent = fullText; playing = false; return; }
         var cursor = document.createElement("span");
         cursor.className = "terminal-cursor";
         cursor.textContent = " ";
@@ -501,10 +588,7 @@ Full details: harness-report.md</pre>
         var observer = new IntersectionObserver(
           function (entries) {
             entries.forEach(function (entry) {
-              if (entry.isIntersecting) {
-                play();
-                observer.disconnect();
-              }
+              if (entry.isIntersecting) { play(); observer.disconnect(); }
             });
           },
           { threshold: 0.4 },
